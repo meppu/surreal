@@ -1,10 +1,12 @@
+%% @hidden
 -module(surreal_ws).
 -behaviour(websocket_client).
 
 -export([
     %% What We Need
-    start_link/2,
+    start_link/1,
     send_message/2,
+    message_broker/0,
     %% Callbacks
     init/1,
     onconnect/2,
@@ -14,41 +16,69 @@
     websocket_terminate/3
 ]).
 
-%% @hidden
-start_link(Url, Pid) ->
-    websocket_client:start_link(Url, ?MODULE, [{pid, Pid}]).
+start_link(Url) ->
+    websocket_client:start_link(Url, ?MODULE, [{pid, spawn(fun message_broker/0)}]).
 
-%% @hidden
-send_message(Pid, Text) ->
-    websocket_client:send(Pid, {text, Text}).
+send_message(Conn, #{<<"id">> := Id} = Msg) ->
+    {Pid, MonitorReference} = spawn_monitor(fun() ->
+        Encoded = jiffy:encode(Msg),
+        websocket_client:send(Conn, {text, Encoded}),
+
+        receive
+            X ->
+                exit({ok, X})
+        end
+    end),
+
+    ets:insert(surreal_pool, {Id, Pid}),
+
+    receive
+        {'DOWN', MonitorReference, process, Pid, {ok, Result}} ->
+            ets:delete(surreal_pool, Id),
+            Result
+    end.
+
+message_broker() ->
+    receive
+        #{<<"id">> := Id} = Data ->
+            case ets:lookup(surreal_pool, Id) of
+                [{Id, Pid} | _Other] ->
+                    Pid ! Data;
+                _ ->
+                    noop
+            end;
+        _ ->
+            noop
+    end,
+
+    message_broker().
 
 %% Starting Callbacks
 %% ------------------
 
-%% @hidden
-init([{pid, Pid}]) ->
-    {once, Pid}.
+init([{pid, State}]) ->
+    case ets:whereis(surreal_pool) of
+        undefined -> ets:new(surreal_pool, [public, named_table, {decentralized_counters, true}]);
+        _ -> noop
+    end,
 
-%% @hidden
+    {once, State}.
+
 onconnect(_WSReq, State) ->
     {ok, State}.
 
-%% @hidden
 ondisconnect({remote, closed}, State) ->
     {reconnect, State}.
 
-%% @hidden
 websocket_handle({ping, <<>>}, _ConnState, State) ->
     {ok, State};
 websocket_handle({text, Msg}, _ConnState, State) ->
-    State ! Msg,
+    State ! jiffy:decode(Msg, [return_maps]),
     {ok, State}.
 
-%% @hidden
 websocket_info(start, _ConnState, State) ->
     {ok, State}.
 
-%% @hidden
 websocket_terminate(Reason, _ConnState, State) ->
     io:format(
         "Websocket closed in state ~p wih reason ~p~n",
