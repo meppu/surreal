@@ -1,0 +1,8 @@
+{"1.2.0",
+[{<<"websocket_client">>,{pkg,<<"websocket_client">>,<<"1.5.0">>},0}]}.
+[
+{pkg_hash,[
+ {<<"websocket_client">>, <<"E825F23C51A867681A222148ED5200CC4A12E4FB5FF0B0B35963E916E2B5766B">>}]},
+{pkg_hash_ext,[
+ {<<"websocket_client">>, <<"2B9B201CC5C82B9D4E6966AD8E605832EAB8F4DDB39F57AC62F34CB208B68DE9">>}]}
+].
