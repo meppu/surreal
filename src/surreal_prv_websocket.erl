@@ -53,8 +53,8 @@ message_broker() ->
 
     message_broker().
 
-% Starting Callbacks
-% ------------------
+%%%% Starting Callbacks
+%%%% ------------------
 
 init([{pid, State}]) ->
     case ets:whereis(surreal_pool) of

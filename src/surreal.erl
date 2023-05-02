@@ -1,5 +1,8 @@
+%%% @doc Base module of the library.
+%%%
+%%% I am trying to avoid complex solutions for simple things. The old implementation (unreal) was unnecessary complex for a WebSocket client. This time I tried to design it way simpler.
+%%% Think this library as a layer that adds SurrealDB WebSocket protocol on top of the WebSocket library ;)
 -module(surreal).
-
 -include("surreal.hrl").
 
 -record(surreal_server_error, {
@@ -16,6 +19,7 @@
 start_link(Url) ->
     surreal_ws:start_link(Url ++ "/rpc").
 
+%% @doc Execute SurrealQL queries. Make sure to send parameters instead of manipulating string to avoid query injection attacks.
 -spec query(Pid :: pid(), Query :: string(), Params :: map()) ->
     surreal_server_error() | surreal_response().
 query(Pid, Query, Params) ->
@@ -32,8 +36,9 @@ query(Pid, Query, Params) ->
 query(Pid, Query) ->
     query(Pid, Query, #{}).
 
-%% Internal Functions
-%% ------------------
+%%%% Private Functions
+%%%% -----------------
+
 %% @hidden
 to_response(#{<<"error">> := #{<<"code">> := Code, <<"message">> := ErrorMsg}}) ->
     #surreal_server_error{
