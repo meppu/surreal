@@ -1,18 +1,18 @@
-%% @hidden
--module(surreal_ws).
+%%% @hidden
+-module(surreal_prv_websocket).
 -behaviour(websocket_client).
 
 -export([
-    %% What We Need
+    % What We Need
     start_link/1,
     send_message/2,
     message_broker/0,
-    %% Callbacks
+    % Callbacks
     init/1,
     onconnect/2,
-    ondisconnect/2,
-    websocket_handle/3,
     websocket_info/3,
+    websocket_handle/3,
+    ondisconnect/2,
     websocket_terminate/3
 ]).
 
@@ -53,8 +53,8 @@ message_broker() ->
 
     message_broker().
 
-%% Starting Callbacks
-%% ------------------
+% Starting Callbacks
+% ------------------
 
 init([{pid, State}]) ->
     case ets:whereis(surreal_pool) of
@@ -67,8 +67,8 @@ init([{pid, State}]) ->
 onconnect(_WSReq, State) ->
     {ok, State}.
 
-ondisconnect({remote, closed}, State) ->
-    {reconnect, State}.
+websocket_info(start, _ConnState, State) ->
+    {ok, State}.
 
 websocket_handle({ping, <<>>}, _ConnState, State) ->
     {ok, State};
@@ -76,12 +76,8 @@ websocket_handle({text, Msg}, _ConnState, State) ->
     State ! jiffy:decode(Msg, [return_maps]),
     {ok, State}.
 
-websocket_info(start, _ConnState, State) ->
-    {ok, State}.
+ondisconnect({remote, closed}, State) ->
+    {reconnect, State}.
 
-websocket_terminate(Reason, _ConnState, State) ->
-    io:format(
-        "Websocket closed in state ~p wih reason ~p~n",
-        [State, Reason]
-    ),
+websocket_terminate(_Reason, _ConnState, _State) ->
     ok.
