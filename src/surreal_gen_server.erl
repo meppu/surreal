@@ -32,6 +32,50 @@ handle_call({signin, User, Pass}, _From, Connection) ->
     ),
 
     {reply, Response, Connection};
+handle_call({signup, Namespace, Database, Scope, Email, Password}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"signup">>,
+        <<"params">> => [
+            #{
+                <<"NS">> => Namespace,
+                <<"DB">> => Database,
+                <<"SC">> => Scope,
+                <<"email">> => Email,
+                <<"pass">> => Password
+            }
+        ]
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
+    {reply, Response, Connection};
+handle_call({authenticate, Token}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"authenticate">>,
+        <<"params">> => [Token]
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
+    {reply, Response, Connection};
+handle_call({invalidate}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"invalidate">>,
+        <<"params">> => []
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
+    {reply, Response, Connection};
 handle_call({use, Namespace, Database}, _From, Connection) ->
     Payload = #{
         <<"id">> => ?RANDOM,
