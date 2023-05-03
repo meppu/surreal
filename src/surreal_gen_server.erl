@@ -57,6 +57,30 @@ handle_call({query, Query, Params}, _From, Connection) ->
         surreal_prv_websocket:send_message(Connection, Payload)
     ),
 
+    {reply, Response, Connection};
+handle_call({select, TableOrId}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"select">>,
+        <<"params">> => [TableOrId]
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
+    {reply, Response, Connection};
+handle_call({create, TableOrId, Data}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"create">>,
+        <<"params">> => [TableOrId, Data]
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
     {reply, Response, Connection}.
 
 %% @hidden

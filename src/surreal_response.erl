@@ -7,8 +7,8 @@
 }).
 
 -type server_error() :: #server_error{}.
--type response() :: list({ok, any()} | {error, string()}).
--type result() :: server_error() | response().
+-type response() :: {ok, any()} | {error, string()}.
+-type result() :: server_error() | response() | list(response()).
 
 %%% For external usage.
 -export_type([server_error/0, response/0, result/0]).
@@ -30,8 +30,10 @@ to_response(#{<<"time">> := _Time, <<"status">> := <<"ERR">>, <<"detail">> := Er
 to_response(#{<<"time">> := _Time, <<"status">> := <<"OK">>, <<"result">> := Result}) ->
     {ok, Result};
 to_response(#{<<"result">> := null}) ->
-    [];
+    {ok, null};
 to_response(#{<<"result">> := Results}) when is_list(Results) ->
     lists:map(fun to_response/1, Results);
+to_response(#{<<"result">> := Result}) when is_map(Result) ->
+    {ok, Result};
 to_response(Other) ->
     {ok, Other}.

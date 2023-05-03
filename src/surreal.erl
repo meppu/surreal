@@ -2,7 +2,7 @@
 -module(surreal).
 
 %%% For external usages.
--export([start_link/1, signin/3, use/3, query/3, query/2]).
+-export([start_link/1, signin/3, use/3, query/3, query/2, select/2, create/3]).
 
 %% @doc Connects to a local or remote database endpoint.
 -spec start_link(Url :: string()) ->
@@ -42,3 +42,21 @@ query(Connection, Query, Params) ->
     surreal_response:result().
 query(Connection, Query) ->
     query(Connection, Query, #{}).
+
+%% @doc Selects all records in a table, or a specific record, from the database.
+-spec select(Connection :: pid(), TableOrId :: string()) ->
+    surreal_response:result().
+select(Connection, TableOrId) ->
+    gen_server:call(
+        Connection,
+        {select, unicode:characters_to_binary(TableOrId)}
+    ).
+
+%% @doc Creates a record in the database.
+-spec create(Connection :: pid(), TableOrId :: string(), Data :: map()) ->
+    surreal_response:result().
+create(Connection, TableOrId, Data) ->
+    gen_server:call(
+        Connection,
+        {create, unicode:characters_to_binary(TableOrId), Data}
+    ).
