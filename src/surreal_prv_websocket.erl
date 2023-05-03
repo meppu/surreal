@@ -53,7 +53,7 @@ message_broker() ->
 
     message_broker().
 
-%%%% Starting Callbacks
+%%%% Starting callbacks.
 %%%% ------------------
 
 init([{pid, State}]) ->
