@@ -81,6 +81,54 @@ handle_call({create, TableOrId, Data}, _From, Connection) ->
         surreal_prv_websocket:send_message(Connection, Payload)
     ),
 
+    {reply, Response, Connection};
+handle_call({update, TableOrId, Data}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"update">>,
+        <<"params">> => [TableOrId, Data]
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
+    {reply, Response, Connection};
+handle_call({change, TableOrId, Data}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"change">>,
+        <<"params">> => [TableOrId, Data]
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
+    {reply, Response, Connection};
+handle_call({modify, TableOrId, Data}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"modify">>,
+        <<"params">> => [TableOrId, Data]
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
+    {reply, Response, Connection};
+handle_call({delete, TableOrId}, _From, Connection) ->
+    Payload = #{
+        <<"id">> => ?RANDOM,
+        <<"method">> => <<"delete">>,
+        <<"params">> => [TableOrId]
+    },
+
+    Response = surreal_response:to_response(
+        surreal_prv_websocket:send_message(Connection, Payload)
+    ),
+
     {reply, Response, Connection}.
 
 %% @hidden
