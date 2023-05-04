@@ -4,6 +4,7 @@
 %%% For external usages.
 -export([
     start_link/1,
+    start/1,
     signin/3,
     signup/6,
     authenticate/2,
@@ -23,6 +24,16 @@
     {ok, pid()} | {error, term()}.
 start_link(Url) ->
     gen_server:start_link(surreal_gen_server, [Url], []).
+
+%% @doc Same with "start_link" but without linking process.
+-spec start(Url :: string()) ->
+    {ok, pid()} | {error, term()}.
+start(Url) ->
+    gen_server:start(surreal_gen_server, [Url], []).
+
+%%% ------------------------------------------------
+%%% Following functions are for database management.
+%%% ------------------------------------------------
 
 %% @doc Signs in to a specific authentication scope.
 -spec signin(Connection :: pid(), User :: string(), Pass :: string()) ->
@@ -71,6 +82,10 @@ use(Connection, Namespace, Database) ->
         Connection,
         {use, unicode:characters_to_binary(Namespace), unicode:characters_to_binary(Database)}
     ).
+
+%%% ------------------------------------------------
+%%% Following functions are for document management.
+%%% ------------------------------------------------
 
 %% @doc Runs a set of SurrealQL statements against the database with parameters.
 -spec query(Connection :: pid(), Query :: string(), Params :: map()) ->

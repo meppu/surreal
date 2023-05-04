@@ -2,18 +2,9 @@
 -module(surreal_prv_websocket).
 -behaviour(websocket_client).
 
+-export([start_link/1, send_message/2, message_broker/0]).
 -export([
-    % What We Need
-    start_link/1,
-    send_message/2,
-    message_broker/0,
-    % Callbacks
-    init/1,
-    onconnect/2,
-    websocket_info/3,
-    websocket_handle/3,
-    ondisconnect/2,
-    websocket_terminate/3
+    init/1, onconnect/2, websocket_info/3, websocket_handle/3, ondisconnect/2, websocket_terminate/3
 ]).
 
 start_link(Url) ->
@@ -53,8 +44,9 @@ message_broker() ->
 
     message_broker().
 
-%%%% Starting callbacks.
-%%%% ------------------
+%%% -----------------------
+%%% Handlers starting here.
+%%% -----------------------
 
 init([{pid, State}]) ->
     case ets:whereis(surreal_pool) of

@@ -6,174 +6,89 @@
 
 -define(RANDOM, base64:encode(crypto:strong_rand_bytes(10))).
 
-%%% Mostly internal, but nothing stops you to use this GenServer.
 -export([init/1, handle_call/3]).
-
-%%% Keeps compiler quite.
 -export([handle_cast/2, handle_info/2, code_change/3]).
 
 init([Url]) ->
     surreal_prv_websocket:start_link(Url ++ "/rpc").
 
-handle_call({signin, User, Pass}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"signin">>,
-        <<"params">> => [
-            #{
-                <<"user">> => User,
-                <<"pass">> => Pass
-            }
-        ]
-    },
+%%% -----------------------------------------------
+%%% Following handlers are for database management.
+%%% -----------------------------------------------
 
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
+handle_call({signin, User, Pass}, _From, Connection) ->
+    Response = send_payload(Connection, <<"signin">>, [
+        #{
+            <<"user">> => User,
+            <<"pass">> => Pass
+        }
+    ]),
 
     {reply, Response, Connection};
 handle_call({signup, Namespace, Database, Scope, Email, Password}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"signup">>,
-        <<"params">> => [
-            #{
-                <<"NS">> => Namespace,
-                <<"DB">> => Database,
-                <<"SC">> => Scope,
-                <<"email">> => Email,
-                <<"pass">> => Password
-            }
-        ]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
+    Response = send_payload(Connection, <<"signup">>, [
+        #{
+            <<"NS">> => Namespace,
+            <<"DB">> => Database,
+            <<"SC">> => Scope,
+            <<"email">> => Email,
+            <<"pass">> => Password
+        }
+    ]),
 
     {reply, Response, Connection};
 handle_call({authenticate, Token}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"authenticate">>,
-        <<"params">> => [Token]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"authenticate">>, [Token]),
     {reply, Response, Connection};
 handle_call({invalidate}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"invalidate">>,
-        <<"params">> => []
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"invalidate">>, []),
     {reply, Response, Connection};
 handle_call({use, Namespace, Database}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"use">>,
-        <<"params">> => [
-            Namespace, Database
-        ]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"use">>, [Namespace, Database]),
     {reply, Response, Connection};
+%%% -----------------------------------------------
+%%% Following handlers are for document management.
+%%% -----------------------------------------------
+
 handle_call({query, Query, Params}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"query">>,
-        <<"params">> => [Query, Params]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"query">>, [Query, Params]),
     {reply, Response, Connection};
 handle_call({select, TableOrId}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"select">>,
-        <<"params">> => [TableOrId]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"select">>, [TableOrId]),
     {reply, Response, Connection};
 handle_call({create, TableOrId, Data}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"create">>,
-        <<"params">> => [TableOrId, Data]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"create">>, [TableOrId, Data]),
     {reply, Response, Connection};
 handle_call({update, TableOrId, Data}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"update">>,
-        <<"params">> => [TableOrId, Data]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"update">>, [TableOrId, Data]),
     {reply, Response, Connection};
 handle_call({change, TableOrId, Data}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"change">>,
-        <<"params">> => [TableOrId, Data]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"change">>, [TableOrId, Data]),
     {reply, Response, Connection};
 handle_call({modify, TableOrId, Data}, _From, Connection) ->
-    Payload = #{
-        <<"id">> => ?RANDOM,
-        <<"method">> => <<"modify">>,
-        <<"params">> => [TableOrId, Data]
-    },
-
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
-
+    Response = send_payload(Connection, <<"modify">>, [TableOrId, Data]),
     {reply, Response, Connection};
 handle_call({delete, TableOrId}, _From, Connection) ->
+    Response = send_payload(Connection, <<"delete">>, [TableOrId]),
+    {reply, Response, Connection}.
+
+%%% -------------------------------------------
+%%% Following functions are for internal usage.
+%%% -------------------------------------------
+
+%% @hidden
+send_payload(Connection, Method, Params) ->
     Payload = #{
         <<"id">> => ?RANDOM,
-        <<"method">> => <<"delete">>,
-        <<"params">> => [TableOrId]
+        <<"method">> => Method,
+        <<"params">> => Params
     },
 
-    Response = surreal_response:to_response(
-        surreal_prv_websocket:send_message(Connection, Payload)
-    ),
+    surreal_response:to_response(surreal_prv_websocket:send_message(Connection, Payload)).
 
-    {reply, Response, Connection}.
+%%% --------------------------------------------------
+%%% Following handlers are for keeping compiler quite.
+%%% --------------------------------------------------
 
 %% @hidden
 handle_cast({stop}, _Connection) ->

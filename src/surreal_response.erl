@@ -10,14 +10,12 @@
 -type response() :: {ok, any()} | {error, string()}.
 -type result() :: server_error() | response() | list(response()).
 
-%%% For external usage.
 -export_type([server_error/0, response/0, result/0]).
-
-%%% For internal usage.
 -export([to_response/1]).
 
-%%% Private functions.
-%%% -----------------
+%%% -------------------------------------------
+%%% Following functions are for internal usage.
+%%% -------------------------------------------
 
 %% @hidden
 to_response(#{<<"error">> := #{<<"code">> := Code, <<"message">> := ErrorMsg}}) ->
