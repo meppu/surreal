@@ -11,7 +11,8 @@ jobs:
 
     strategy:
       matrix:
-        otp: ["25.3", "23.3"]
+        otp: ["25", "24"]
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v3
@@ -19,6 +20,8 @@ jobs:
         with:
           otp-version: ${{ matrix.otp }}
           rebar3-version: "3.20.0"
+          install-hex: false
+          version-type: strict
 
       - name: Compile project
         run: rebar3 compile
