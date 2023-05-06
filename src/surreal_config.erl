@@ -23,7 +23,9 @@ load(Config) ->
     case load_piece({start, Config}) of
         {ok, Pid} ->
             load_piece({signin, Pid, Config}),
-            load_piece({use, Pid, Config});
+            load_piece({use, Pid, Config}),
+
+            {ok, Pid};
         Other ->
             Other
     end.
@@ -61,8 +63,10 @@ load_piece({start, Config}) ->
             end;
         false ->
             case proplists:get_value(name, Config) of
-                undefined -> surreal:start(WebSocketUrl);
-                Name -> gen_server:start({local, Name}, surreal_gen_server, [WebSocketUrl], [])
+                undefined ->
+                    surreal:start(WebSocketUrl);
+                Name ->
+                    gen_server:start({local, Name}, surreal_gen_server, [WebSocketUrl], [])
             end
     end;
 load_piece({signin, Pid, Config}) ->
@@ -74,8 +78,8 @@ load_piece({signin, Pid, Config}) ->
     end;
 load_piece({use, Pid, Config}) ->
     case proplists:get_value(use, Config) of
-        {User, Pass} ->
-            surreal:use(Pid, User, Pass);
+        {Namespace, Database} ->
+            surreal:use(Pid, Namespace, Database);
         _ ->
             noop
     end.

@@ -10,7 +10,11 @@
 -export([handle_cast/2, handle_info/2, code_change/3]).
 
 init([Url]) ->
-    surreal_prv_websocket:start_link(Url ++ "/rpc").
+    Result = surreal_prv_websocket:start_link(Url ++ "/rpc", self()),
+
+    receive
+        ok -> Result
+    end.
 
 %%% -----------------------------------------------
 %%% Following handlers are for database management.
