@@ -18,6 +18,8 @@ send_message(Conn, #{<<"id">> := Id} = Msg) ->
         receive
             X ->
                 exit({ok, X})
+        after 5000 ->
+            exit({error, timeout})
         end
     end),
 

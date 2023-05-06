@@ -20,50 +20,62 @@
 -spec load(Config :: config()) ->
     {ok, pid()}.
 load(Config) ->
-    % This function needs a fix for readability.
+    case load_piece({start, Config}) of
+        {ok, Pid} ->
+            load_piece({signin, Pid, Config}),
+            load_piece({use, Pid, Config});
+        Other ->
+            Other
+    end.
 
-    WebSocketSecure =
-        case proplists:is_defined(secure, Config) of
-            true ->
-                "wss";
-            false ->
-                "ws"
-        end,
+%%% -------------------------------------------
+%%% Following functions are for internal usage.
+%%% -------------------------------------------
 
-    WebSocketUrl = lists:flatten(
+%% @private
+load_piece({protocol, Config}) ->
+    case proplists:is_defined(secure, Config) of
+        true ->
+            "wss";
+        false ->
+            "ws"
+    end;
+load_piece({url, Config}) ->
+    WebSocketProtocol = load_piece({protocol, Config}),
+
+    lists:flatten(
         io_lib:format("~s://~s:~b", [
-            WebSocketSecure, proplists:get_value(host, Config), proplists:get_value(port, Config)
+            WebSocketProtocol, proplists:get_value(host, Config), proplists:get_value(port, Config)
         ])
-    ),
+    );
+load_piece({start, Config}) ->
+    WebSocketUrl = load_piece({url, Config}),
 
-    {ok, Pid} =
-        case proplists:is_defined(link, Config) of
-            true ->
-                case proplists:get_value(name, Config) of
-                    undefined ->
-                        surreal:start_link(WebSocketUrl);
-                    Name ->
-                        gen_server:start_link({local, Name}, surreal_gen_server, [WebSocketUrl], [])
-                end;
-            false ->
-                case proplists:get_value(name, Config) of
-                    undefined -> surreal:start(WebSocketUrl);
-                    Name -> gen_server:start({local, Name}, surreal_gen_server, [WebSocketUrl], [])
-                end
-        end,
-
+    case proplists:is_defined(link, Config) of
+        true ->
+            case proplists:get_value(name, Config) of
+                undefined ->
+                    surreal:start_link(WebSocketUrl);
+                Name ->
+                    gen_server:start_link({local, Name}, surreal_gen_server, [WebSocketUrl], [])
+            end;
+        false ->
+            case proplists:get_value(name, Config) of
+                undefined -> surreal:start(WebSocketUrl);
+                Name -> gen_server:start({local, Name}, surreal_gen_server, [WebSocketUrl], [])
+            end
+    end;
+load_piece({signin, Pid, Config}) ->
     case proplists:get_value(signin, Config) of
         {User, Pass} ->
             surreal:signin(Pid, User, Pass);
         _ ->
             noop
-    end,
-
+    end;
+load_piece({use, Pid, Config}) ->
     case proplists:get_value(use, Config) of
-        {Namespace, Database} ->
-            surreal:use(Pid, Namespace, Database);
+        {User, Pass} ->
+            surreal:use(Pid, User, Pass);
         _ ->
             noop
-    end,
-
-    {ok, Pid}.
+    end.
