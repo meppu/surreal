@@ -65,7 +65,7 @@ Add `surreal` to your list of dependencies in `rebar.config` file:
 
 ## Documentation
 
-Documentation is avaible at [HexDocs](https://hexdocs.pm/surreal).
+Documentation is available at [HexDocs](https://hexdocs.pm/surreal).
 
 ## Contributing
 

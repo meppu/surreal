@@ -18,7 +18,6 @@ loader_test() ->
     }),
 
     Should = {ok, #{<<"id">> => <<"testing:wow">>, <<"name">> => <<"kekw">>}},
-
     ?assertEqual(Result, Should).
 
 surreal_test() ->
