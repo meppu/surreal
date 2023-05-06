@@ -76,7 +76,7 @@ handle_call({delete, TableOrId}, _From, Connection) ->
 %%% Following functions are for internal usage.
 %%% -------------------------------------------
 
-%% @hidden
+%% @private
 send_payload(Connection, Method, Params) ->
     Payload = #{
         <<"id">> => ?RANDOM,
@@ -90,14 +90,14 @@ send_payload(Connection, Method, Params) ->
 %%% Following handlers are for keeping compiler quite.
 %%% --------------------------------------------------
 
-%% @hidden
+%% @private
 handle_cast({stop}, _Connection) ->
     {noreply, null}.
 
-%% @hidden
+%% @private
 handle_info(_Message, Connection) ->
     {noreply, Connection}.
 
-%% @hidden
+%% @private
 code_change(_OldVersion, Connection, _Extra) ->
     {ok, Connection}.

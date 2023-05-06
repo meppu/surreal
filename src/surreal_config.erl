@@ -3,10 +3,21 @@
 %%% This module allows you to set configs and use them with calling one function.
 -module(surreal_config).
 
+-type config_value() ::
+    secure
+    | link
+    | {name, atom()}
+    | {host, string()}
+    | {port, integer()}
+    | {signin, {string(), string()}}
+    | {use, {string(), string()}}.
+
+-type config() :: list(config_value()).
+
 -export([load/1]).
 
 %% @doc Start client from config.
--spec load(Config :: proplists:proplist()) ->
+-spec load(Config :: config()) ->
     {ok, pid()}.
 load(Config) ->
     % This function needs a fix for readability.

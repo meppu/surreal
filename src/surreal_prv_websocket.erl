@@ -1,4 +1,4 @@
-%%% @hidden
+%%% @private
 -module(surreal_prv_websocket).
 -behaviour(websocket_client).
 

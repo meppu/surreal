@@ -17,7 +17,7 @@
 %%% Following functions are for internal usage.
 %%% -------------------------------------------
 
-%% @hidden
+%% @private
 to_response(#{<<"error">> := #{<<"code">> := Code, <<"message">> := ErrorMsg}}) ->
     #server_error{
         code = Code,
