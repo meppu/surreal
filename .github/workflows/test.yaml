@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -23,11 +26,24 @@ jobs:
           install-hex: false
           version-type: strict
 
-      - name: Compile project
+      - name: Restore Cache
+        uses: actions/cache@v3
+        with:
+          path: _build
+          key: build-${{ hashFiles('**/rebar.lock') }}-${{ matrix.otp }}-otp
+
+      - name: Compile Project
         run: rebar3 compile
 
-      - name: Check format
+      - name: Check Format
         run: rebar3 fmt --check
 
-      - name: Run tests
+      - name: Set up SurrealDB
+        run: |
+          docker run -d -p 8000:8000 \
+          surrealdb/surrealdb:latest \
+          start --user root --pass root \
+          memory
+
+      - name: Run Tests
         run: rebar3 eunit --verbose
