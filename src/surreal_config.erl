@@ -44,12 +44,16 @@ load_piece({protocol, Config}) ->
     end;
 load_piece({url, Config}) ->
     WebSocketProtocol = load_piece({protocol, Config}),
+    WebSocketHost = proplists:get_value(host, Config),
+    WebSocketUrl =
+        case proplists:get_value(port, Config) of
+            undefined ->
+                io_lib:format("~s://~s", [WebSocketProtocol, WebSocketHost]);
+            Port ->
+                io_lib:format("~s://~s:~b", [WebSocketProtocol, WebSocketHost, Port])
+        end,
 
-    lists:flatten(
-        io_lib:format("~s://~s:~b", [
-            WebSocketProtocol, proplists:get_value(host, Config), proplists:get_value(port, Config)
-        ])
-    );
+    lists:flatten(WebSocketUrl);
 load_piece({start, Config}) ->
     WebSocketUrl = load_piece({url, Config}),
 

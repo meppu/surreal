@@ -1,6 +1,6 @@
 {application, surreal, [
     {description, "Erlang driver for SurrealDB"},
-    {vsn, "0.1.0"},
+    {vsn, "1.0.0-beta"},
     {registered, []},
     {applications, [
         kernel,
@@ -12,5 +12,5 @@
     {modules, []},
 
     {licenses, ["MIT"]},
-    {links, []}
+    {links, [{"GitHub", "https://github.com/meppu/surreal"}]}
 ]}.
