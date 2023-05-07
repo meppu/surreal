@@ -18,7 +18,29 @@ make_one_command({select, Fields}) when is_list(Fields) ->
     WithFormatted = lists:flatten(lists:join(", ", ToString)),
 
     io_lib:format("SELECT ~s", [WithFormatted]);
-make_one_command({from, Something}) ->
-    io_lib:format("FROM ~s", [Something]);
+make_one_command({from, Target}) when is_binary(Target); is_atom(Target); is_bitstring(Target) ->
+    io_lib:format("FROM ~s", [Target]);
+make_one_command({from, Targets}) when is_list(Targets) ->
+    ToString = lists:map(fun atom_to_list/1, Targets),
+    WithFormatted = lists:flatten(lists:join(", ", ToString)),
+
+    io_lib:format("FROM ~s", [WithFormatted]);
+make_one_command({where, {Operator, Left, Right}}) ->
+    io_lib:format("WHERE ~p ~s ~p", [Left, Operator, Right]);
+make_one_command({where, {Left, Right}}) ->
+    io_lib:format("WHERE ~p = ~p", [Left, Right]);
+make_one_command({where, Conditions}) when is_list(Conditions) ->
+    NewConditions = lists:map(fun(Condition) -> {where, Condition} end, Conditions),
+    WithConcat = lists:map(
+        fun(Condition) ->
+            [_, _, _, _, _, _ | Actual] = make_one_command(Condition),
+            Actual
+        end,
+
+        NewConditions
+    ),
+    WithFormatted = lists:flatten(lists:join(", ", WithConcat)),
+
+    io_lib:format("WHERE ~s", [WithFormatted]);
 make_one_command(_Other) ->
     "".
