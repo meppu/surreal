@@ -16,7 +16,8 @@
     update/3,
     change/3,
     modify/3,
-    delete/2
+    delete/2,
+    close/1
 ]).
 
 %% @doc Connects to a local or remote database endpoint.
@@ -155,3 +156,8 @@ delete(Connection, TableOrId) ->
         Connection,
         {delete, unicode:characters_to_binary(TableOrId)}
     ).
+
+%% @doc Close connection.
+-spec close(Connection :: pid()) -> shutdown_ok.
+close(Connection) ->
+    gen_server:call(Connection, {stop}).

@@ -74,7 +74,10 @@ handle_call({modify, TableOrId, Data}, _From, Connection) ->
     {reply, Response, Connection};
 handle_call({delete, TableOrId}, _From, Connection) ->
     Response = send_payload(Connection, <<"delete">>, [TableOrId]),
-    {reply, Response, Connection}.
+    {reply, Response, Connection};
+handle_call({stop}, _From, Connection) ->
+    Connection ! {close},
+    {stop, normal, shutdown_ok, Connection}.
 
 %%% -------------------------------------------
 %%% Following functions are for internal usage.
@@ -95,8 +98,8 @@ send_payload(Connection, Method, Params) ->
 %%% --------------------------------------------------
 
 %% @private
-handle_cast({stop}, _Connection) ->
-    {noreply, null}.
+handle_cast(_Message, Connection) ->
+    {noreply, Connection}.
 
 %% @private
 handle_info(_Message, Connection) ->

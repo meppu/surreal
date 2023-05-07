@@ -65,8 +65,8 @@ init([{pid, State}, {notify, NotifyPid}]) ->
 onconnect(_WSReq, State) ->
     {ok, State}.
 
-websocket_info(start, _ConnState, State) ->
-    {ok, State}.
+websocket_info({close}, _ConnState, State) ->
+    {close, <<>>, State}.
 
 websocket_handle({ping, <<>>}, _ConnState, {State, NotifyPid}) ->
     % Send message to pid to know the connection is established.
@@ -76,6 +76,8 @@ websocket_handle({ping, <<>>}, _ConnState, State) ->
     {ok, State};
 websocket_handle({text, Msg}, _ConnState, State) ->
     State ! jiffy:decode(Msg, [return_maps]),
+    {ok, State};
+websocket_handle(_Message, _ConnState, State) ->
     {ok, State}.
 
 ondisconnect({remote, closed}, State) ->
