@@ -26,9 +26,9 @@ make_one_command({from, Targets}) when is_list(Targets) ->
 
     io_lib:format("FROM ~s", [WithFormatted]);
 make_one_command({where, {Operator, Left, Right}}) ->
-    io_lib:format("WHERE ~p ~s ~p", [Left, Operator, Right]);
+    io_lib:format("WHERE ~s ~s ~p", [Left, Operator, Right]);
 make_one_command({where, {Left, Right}}) ->
-    io_lib:format("WHERE ~p = ~p", [Left, Right]);
+    io_lib:format("WHERE ~s = ~p", [Left, Right]);
 make_one_command({where, Conditions}) when is_list(Conditions) ->
     NewConditions = lists:map(fun(Condition) -> {where, Condition} end, Conditions),
     WithConcat = lists:map(
@@ -42,5 +42,22 @@ make_one_command({where, Conditions}) when is_list(Conditions) ->
     WithFormatted = lists:flatten(lists:join(", ", WithConcat)),
 
     io_lib:format("WHERE ~s", [WithFormatted]);
+make_one_command({create, Something}) ->
+    io_lib:format("CREATE ~s", [Something]);
+make_one_command({set, {Key, Value}}) ->
+    io_lib:format("SET ~s = ~p", [Key, Value]);
+make_one_command({set, AllKv}) when is_list(AllKv) ->
+    NewKv = lists:map(fun(Kv) -> {set, Kv} end, AllKv),
+    WithConcat = lists:map(
+        fun(Condition) ->
+            [_, _, _, _ | Actual] = make_one_command(Condition),
+            Actual
+        end,
+
+        NewKv
+    ),
+    WithFormatted = lists:flatten(lists:join(", ", WithConcat)),
+
+    io_lib:format("SET ~s", [WithFormatted]);
 make_one_command(_Other) ->
     "".
