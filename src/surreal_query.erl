@@ -11,7 +11,7 @@ make_one(Query) ->
 %% @private
 make_one_command({select}) ->
     "SELECT *";
-make_one_command({select, Field}) when is_atom(Field) ->
+make_one_command({select, Field}) when is_binary(Field); is_atom(Field); is_bitstring(Field) ->
     io_lib:format("SELECT ~s", [Field]);
 make_one_command({select, Fields}) when is_list(Fields) ->
     ToString = lists:map(fun atom_to_list/1, Fields),
