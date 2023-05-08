@@ -82,5 +82,12 @@ make_one_command({delete, Something}) ->
 %% UPDATE Builders
 make_one_command({update, Something}) ->
     io_lib:format("UPDATE ~s", [Something]);
+%% USE Builders
+make_one_command({use, {namespace, Namespace}}) ->
+    io_lib:format("USE NS ~s", [Namespace]);
+make_one_command({use, {database, Database}}) ->
+    io_lib:format("USE DB ~s", [Database]);
+make_one_command({use, {Namespace, Database}}) ->
+    io_lib:format("USE NS ~s DB ~s", [Namespace, Database]);
 make_one_command(_Other) ->
     "".
