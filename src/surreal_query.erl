@@ -73,5 +73,8 @@ make_one_command({set, AllKv}) when is_list(AllKv) ->
 %% LET Builders
 make_one_command({var, {Key, Value}}) ->
     io_lib:format("LET $~s = ~p", [Key, Value]);
+%% SLEEP Builders
+make_one_command({sleep, MsDuration}) ->
+    io_lib:format("SLEEP ~pms", [MsDuration]);
 make_one_command(_Other) ->
     "".
