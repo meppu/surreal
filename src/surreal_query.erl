@@ -76,5 +76,11 @@ make_one_command({var, {Key, Value}}) ->
 %% SLEEP Builders
 make_one_command({sleep, MsDuration}) ->
     io_lib:format("SLEEP ~pms", [MsDuration]);
+%% DELETE Builders
+make_one_command({delete, Something}) ->
+    io_lib:format("DELETE ~s", [Something]);
+%% UPDATE Builders
+make_one_command({update, Something}) ->
+    io_lib:format("UPDATE ~s", [Something]);
 make_one_command(_Other) ->
     "".
