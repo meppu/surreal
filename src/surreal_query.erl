@@ -70,5 +70,8 @@ make_one_command({set, AllKv}) when is_list(AllKv) ->
     WithFormatted = lists:flatten(lists:join(", ", WithConcat)),
 
     io_lib:format("SET ~s", [WithFormatted]);
+%% LET Builders
+make_one_command({var, {Key, Value}}) ->
+    io_lib:format("LET $~s = ~p", [Key, Value]);
 make_one_command(_Other) ->
     "".
