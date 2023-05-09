@@ -15,19 +15,15 @@ start_link(Url, NotifyPid) ->
 send_message(Conn, #{<<"id">> := Id} = Msg) ->
     {Pid, MonitorReference} = spawn_monitor(fun() ->
         receive
-            ok ->
-                Encoded = jiffy:encode(Msg),
-                websocket_client:cast(Conn, {text, Encoded}),
-
-                receive
-                    Value ->
-                        exit({ok, Value})
-                end
+            Value ->
+                exit({ok, Value})
         end
     end),
 
     ets:insert(surreal_pool, {Id, Pid}),
-    Pid ! ok,
+
+    Encoded = jiffy:encode(Msg),
+    websocket_client:cast(Conn, {text, Encoded}),
 
     receive
         {'DOWN', MonitorReference, process, Pid, {ok, Result}} ->
