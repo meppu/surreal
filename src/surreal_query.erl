@@ -28,6 +28,7 @@
     | {use, {database, Database :: string_format()}}
     | {use, {Namespace :: string_format(), Database :: string_format()}}.
 
+%% Generate a query string from list of queries (list of operations).
 -spec make_all(Queries :: list(list(query()))) -> string().
 make_all(Queries) ->
     Results = lists:map(fun make_one/1, Queries),
@@ -35,6 +36,7 @@ make_all(Queries) ->
 
     lists:flatten(WithFormatted).
 
+%% Generate a query string from list of operations.
 -spec make_one(Query :: list(query())) -> string().
 make_one(Query) ->
     Results = lists:map(fun make_one_command/1, Query),
