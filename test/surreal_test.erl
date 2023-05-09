@@ -38,3 +38,20 @@ surreal_test() ->
 
     Result3 = surreal:delete(Pid, "testing:wow"),
     ?assertEqual(Result3, Should1And3).
+
+query_test() ->
+    Query1 = [
+        [
+            {use, {test, test}}
+        ],
+        [
+            {select},
+            {from, users},
+            {where, [{'>', age, 13}, {verified, true}]}
+        ]
+    ],
+
+    Should1 =
+        "USE NS test DB test;\nSELECT * FROM users WHERE age > 13, verified = true;",
+
+    ?assertEqual(surreal_query:make_all(Query1), Should1).
