@@ -1,61 +1,32 @@
 -module(surreal_query).
 
 -export([make_one/1, make_all/1]).
+-export_type([query/0]).
 
 -type string_format() :: binary() | atom() | bitstring().
-
--type block_type() ::
-    {block, Inside :: list(query())}.
-
--type select_type() ::
-    {select}
-    | {select, Field :: string_format()}.
-
--type from_type() ::
-    {from, Target :: string_format()}
-    | {from, Targets :: list(string_format())}.
-
--type where_type() ::
-    {where, {Operator :: string_format(), Left :: string_format(), Right :: term()}}
+-type query() ::
+    {block, Inside :: list(query())}
+    | {select}
+    | {select, Field :: string_format()}
+    | {from, Target :: string_format()}
+    | {from, Targets :: list(string_format())}
+    | {where, {Operator :: string_format(), Left :: string_format(), Right :: term()}}
     | {where, {Left :: string_format(), Right :: term()}}
-    | {where, Conditions :: list(where_type())}.
-
--type create_type() ::
-    {create, Something :: string_format()}.
-
--type set_type() ::
-    {set, {Key :: string_format(), Value :: term()}}
-    | {set, list(set_type())}.
-
--type var_type() ::
-    {var, {Key :: string_format(), Value :: term()}}.
-
--type sleep_type() ::
-    {sleep, Millis :: integer()}.
-
--type delete_type() ::
-    {delete, Something :: string_format()}.
-
--type update_type() ::
-    {update, Something :: string_format()}.
-
--type use_type() ::
-    {use, {namespace, Namespace :: string_format()}}
+    | {where,
+        Conditions :: list(
+            {Operator :: string_format(), Left :: string_format(), Right :: term()}
+            | {Left :: string_format(), Right :: term()}
+        )}
+    | {create, Something :: string_format()}
+    | {set, {Key :: string_format(), Value :: term()}}
+    | {set, list({Key :: string_format(), Value :: term()})}
+    | {var, {Key :: string_format(), Value :: term()}}
+    | {sleep, Millis :: integer()}
+    | {delete, Something :: string_format()}
+    | {update, Something :: string_format()}
+    | {use, {namespace, Namespace :: string_format()}}
     | {use, {database, Database :: string_format()}}
     | {use, {Namespace :: string_format(), Database :: string_format()}}.
-
--type query() ::
-    block_type()
-    | select_type()
-    | from_type()
-    | where_type()
-    | create_type()
-    | set_type()
-    | var_type()
-    | sleep_type()
-    | delete_type()
-    | update_type()
-    | use_type().
 
 -spec make_all(Queries :: list(list(query()))) -> string().
 make_all(Queries) ->
