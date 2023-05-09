@@ -1,6 +1,12 @@
 -module(surreal_query).
 
--export([make_one/1]).
+-export([make_one/1, make_all/1]).
+
+make_all(Queries) ->
+    Results = lists:map(fun make_one/1, Queries),
+    WithFormatted = lists:join("\n", Results),
+
+    lists:flatten(WithFormatted).
 
 make_one(Query) ->
     Results = lists:map(fun make_one_command/1, Query),
