@@ -1,7 +1,6 @@
 -module(surreal_query).
 
 -export([make_one/1, make_all/1]).
--export_type([query/0]).
 
 -type string_format() :: binary() | atom() | bitstring().
 -type query() ::
