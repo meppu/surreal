@@ -8,6 +8,8 @@ Erlang driver for SurrealDB.
 
 </div>
 
+> ⚠️ You are currently viewing main branch ⚠️
+
 Package name named as [surreal on hex](https://hex.pm/packages/surreal). Because an Erlang implementation can be used in other languages that runs on BEAM virtual machine, such as Elixir and Gleam.
 
 This library tries to be compatible with the [official implementation.](https://github.com/surrealdb/surrealdb.js)
@@ -17,7 +19,7 @@ This library tries to be compatible with the [official implementation.](https://
 Add `surreal` to your list of dependencies in `rebar.config` file:
 
 ```erlang
-{deps, [{surreal, "1.0.0-beta"}]}.
+{deps, [{surreal, "1.0.0"}]}.
 ```
 
 ## Usage
