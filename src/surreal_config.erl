@@ -14,7 +14,17 @@
 
 -type config() :: list(config_value()).
 
--export([load/1]).
+-export([child_spec/1, load/1]).
+
+%% @doc Child specifications for Surreal connection.
+-spec child_spec(Config :: config()) -> supervisor:child_spec().
+child_spec(Config) ->
+    Name = proplists:get_value(name, Config),
+
+    #{
+        id => Name,
+        start => {surreal_config, load, [Config]}
+    }.
 
 %% @doc Start client from config.
 -spec load(Config :: config()) ->

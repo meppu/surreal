@@ -1,3 +1,4 @@
+%%% @doc Query builder for Surreal.
 -module(surreal_query).
 
 -export([make_one/1, make_all/1]).
@@ -77,7 +78,7 @@ make_one_command({where, Conditions}) when is_list(Conditions) ->
     NewConditions = lists:map(fun(Condition) -> {where, Condition} end, Conditions),
     WithConcat = lists:map(
         fun(Condition) ->
-            [_, _, _, _, _, _ | Actual] = make_one_command(Condition),
+            "WHERE " ++ Actual = make_one_command(Condition),
             Actual
         end,
 
@@ -96,7 +97,7 @@ make_one_command({set, AllKv}) when is_list(AllKv) ->
     NewKv = lists:map(fun(Kv) -> {set, Kv} end, AllKv),
     WithConcat = lists:map(
         fun(Condition) ->
-            [_, _, _, _ | Actual] = make_one_command(Condition),
+            "SET " ++ Actual = make_one_command(Condition),
             Actual
         end,
 
