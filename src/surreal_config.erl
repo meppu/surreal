@@ -61,14 +61,14 @@ load_piece({start, Config}) ->
         true ->
             case proplists:get_value(name, Config) of
                 undefined ->
-                    surreal:start_link(WebSocketUrl);
+                    gen_server:start_link(surreal_gen_server, [WebSocketUrl], []);
                 Name ->
                     gen_server:start_link({local, Name}, surreal_gen_server, [WebSocketUrl], [])
             end;
         false ->
             case proplists:get_value(name, Config) of
                 undefined ->
-                    surreal:start(WebSocketUrl);
+                    gen_server:start(surreal_gen_server, [WebSocketUrl], []);
                 Name ->
                     gen_server:start({local, Name}, surreal_gen_server, [WebSocketUrl], [])
             end
