@@ -19,12 +19,15 @@
 %% @doc Child specifications for Surreal connection.
 -spec child_spec(Config :: config()) -> supervisor:child_spec().
 child_spec(Config) ->
-    Name = proplists:get_value(name, Config),
-
-    #{
-        id => Name,
-        start => {surreal_config, load, [Config]}
-    }.
+    case proplists:get_value(name, Config) of
+        undefined ->
+            erlang:error("Please provide a name for child specification");
+        Name ->
+            #{
+                id => Name,
+                start => {surreal_config, load, [Config]}
+            }
+    end.
 
 %% @doc Start client from config.
 -spec load(Config :: config()) ->
