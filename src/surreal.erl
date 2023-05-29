@@ -37,7 +37,7 @@ start(Url) ->
 %%% ------------------------------------------------
 
 %% @doc Signs in to a specific authentication scope.
--spec signin(Connection :: pid(), User :: string(), Pass :: string()) ->
+-spec signin(Connection :: gen_server:server_ref(), User :: string(), Pass :: string()) ->
     surreal_response:result().
 signin(Connection, User, Pass) ->
     gen_server:call(
@@ -47,7 +47,7 @@ signin(Connection, User, Pass) ->
 
 %% @doc Signs up to a specific authentication scope.
 -spec signup(
-    Connection :: pid(),
+    Connection :: gen_server:server_ref(),
     Namespace :: string(),
     Database :: string(),
     Scope :: string(),
@@ -64,19 +64,19 @@ signup(Connection, Namespace, Database, Scope, Email, Password) ->
     ).
 
 %% @doc Authenticates the current connection with a JWT token.
--spec authenticate(Connection :: pid(), Token :: string()) ->
+-spec authenticate(Connection :: gen_server:server_ref(), Token :: string()) ->
     surreal_response:result().
 authenticate(Connection, Token) ->
     gen_server:call(Connection, {authenticate, unicode:characters_to_binary(Token)}).
 
 %% @doc Invalidates the authentication for the current connection.
--spec invalidate(Connection :: pid()) ->
+-spec invalidate(Connection :: gen_server:server_ref()) ->
     surreal_response:result().
 invalidate(Connection) ->
     gen_server:call(Connection, {invalidate}).
 
 %% @doc Switch to a specific namespace and database.
--spec use(Connection :: pid(), Namespace :: string(), Database :: string()) ->
+-spec use(Connection :: gen_server:server_ref(), Namespace :: string(), Database :: string()) ->
     surreal_response:result().
 use(Connection, Namespace, Database) ->
     gen_server:call(
@@ -89,7 +89,7 @@ use(Connection, Namespace, Database) ->
 %%% ------------------------------------------------
 
 %% @doc Runs a set of SurrealQL statements against the database with parameters.
--spec query(Connection :: pid(), Query :: string(), Params :: map()) ->
+-spec query(Connection :: gen_server:server_ref(), Query :: string(), Params :: map()) ->
     surreal_response:result().
 query(Connection, Query, Params) ->
     gen_server:call(
@@ -98,13 +98,13 @@ query(Connection, Query, Params) ->
     ).
 
 %% @doc Runs a set of SurrealQL statements against the database.
--spec query(Connection :: pid(), Query :: string()) ->
+-spec query(Connection :: gen_server:server_ref(), Query :: string()) ->
     surreal_response:result().
 query(Connection, Query) ->
     query(Connection, Query, #{}).
 
 %% @doc Selects all records in a table, or a specific record, from the database.
--spec select(Connection :: pid(), TableOrId :: string()) ->
+-spec select(Connection :: gen_server:server_ref(), TableOrId :: string()) ->
     surreal_response:result().
 select(Connection, TableOrId) ->
     gen_server:call(
@@ -113,7 +113,7 @@ select(Connection, TableOrId) ->
     ).
 
 %% @doc Creates a record in the database.
--spec create(Connection :: pid(), TableOrId :: string(), Data :: map()) ->
+-spec create(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
     surreal_response:result().
 create(Connection, TableOrId, Data) ->
     gen_server:call(
@@ -122,7 +122,7 @@ create(Connection, TableOrId, Data) ->
     ).
 
 %% @doc Updates all records in a table, or a specific record.
--spec update(Connection :: pid(), TableOrId :: string(), Data :: map()) ->
+-spec update(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
     surreal_response:result().
 update(Connection, TableOrId, Data) ->
     gen_server:call(
@@ -131,7 +131,7 @@ update(Connection, TableOrId, Data) ->
     ).
 
 %% @doc Change all records in a table, or a specific record.
--spec change(Connection :: pid(), TableOrId :: string(), Data :: map()) ->
+-spec change(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
     surreal_response:result().
 change(Connection, TableOrId, Data) ->
     gen_server:call(
@@ -140,7 +140,7 @@ change(Connection, TableOrId, Data) ->
     ).
 
 %% @doc Applies JSON Patch changes to all records in a table, or a specific record.
--spec modify(Connection :: pid(), TableOrId :: string(), Data :: map()) ->
+-spec modify(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
     surreal_response:result().
 modify(Connection, TableOrId, Data) ->
     gen_server:call(
@@ -149,7 +149,7 @@ modify(Connection, TableOrId, Data) ->
     ).
 
 %% @doc Deletes all records in a table, or a specific record, from the database.
--spec delete(Connection :: pid(), TableOrId :: string()) ->
+-spec delete(Connection :: gen_server:server_ref(), TableOrId :: string()) ->
     surreal_response:result().
 delete(Connection, TableOrId) ->
     gen_server:call(
@@ -158,6 +158,6 @@ delete(Connection, TableOrId) ->
     ).
 
 %% @doc Close connection.
--spec close(Connection :: pid()) -> shutdown_ok.
+-spec close(Connection :: gen_server:server_ref()) -> shutdown_ok.
 close(Connection) ->
     gen_server:call(Connection, {stop}).

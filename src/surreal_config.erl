@@ -14,7 +14,20 @@
 
 -type config() :: list(config_value()).
 
--export([load/1]).
+-export([child_spec/1, load/1]).
+
+%% @doc Child specifications for Surreal connection.
+-spec child_spec(Config :: config()) -> supervisor:child_spec().
+child_spec(Config) ->
+    case proplists:get_value(name, Config) of
+        undefined ->
+            erlang:error("Please provide a name for child specification");
+        Name ->
+            #{
+                id => Name,
+                start => {surreal_config, load, [Config]}
+            }
+    end.
 
 %% @doc Start client from config.
 -spec load(Config :: config()) ->
@@ -61,14 +74,14 @@ load_piece({start, Config}) ->
         true ->
             case proplists:get_value(name, Config) of
                 undefined ->
-                    surreal:start_link(WebSocketUrl);
+                    gen_server:start_link(surreal_gen_server, [WebSocketUrl], []);
                 Name ->
                     gen_server:start_link({local, Name}, surreal_gen_server, [WebSocketUrl], [])
             end;
         false ->
             case proplists:get_value(name, Config) of
                 undefined ->
-                    surreal:start(WebSocketUrl);
+                    gen_server:start(surreal_gen_server, [WebSocketUrl], []);
                 Name ->
                     gen_server:start({local, Name}, surreal_gen_server, [WebSocketUrl], [])
             end

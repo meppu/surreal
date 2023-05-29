@@ -56,7 +56,7 @@ init([{pid, State}, {notify, NotifyPid}]) ->
         _ -> noop
     end,
 
-    {once, {State, NotifyPid}}.
+    {reconnect, {State, NotifyPid}}.
 
 onconnect(_WSReq, State) ->
     {ok, State}.
@@ -77,7 +77,9 @@ websocket_handle(_Message, _ConnState, State) ->
     {ok, State}.
 
 ondisconnect({remote, closed}, State) ->
-    {reconnect, State}.
+    {reconnect, State};
+ondisconnect(Reason, State) ->
+    {close, Reason, State}.
 
 websocket_terminate(_Reason, _ConnState, _State) ->
     ok.
