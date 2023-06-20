@@ -37,12 +37,30 @@ start(Url) ->
 %%% ------------------------------------------------
 
 %% @doc Signs in to a specific authentication scope.
--spec signin(Connection :: gen_server:server_ref(), User :: string(), Pass :: string()) ->
+-spec signin(Connection :: gen_server:server_ref(), Username :: string(), Password :: string()) ->
     surreal_response:result().
-signin(Connection, User, Pass) ->
+signin(Connection, Username, Password) ->
     gen_server:call(
         Connection,
-        {signin, unicode:characters_to_binary(User), unicode:characters_to_binary(Pass)}
+        {signin, unicode:characters_to_binary(Username), unicode:characters_to_binary(Password)}
+    ).
+
+%% @doc Signs in to a specific authentication scope with more advanced inputs.
+-spec signin(
+    Connection :: gen_server:server_ref(),
+    Namespace :: string(),
+    Database :: string(),
+    Scope :: string(),
+    Username :: string(),
+    Password :: string()
+) ->
+    surreal_response:result().
+signin(Connection, Namespace, Database, Scope, Username, Password) ->
+    gen_server:call(
+        Connection,
+        {signin, unicode:characters_to_binary(Namespace), unicode:characters_to_binary(Database),
+            unicode:characters_to_binary(Scope), unicode:characters_to_binary(Username),
+            unicode:characters_to_binary(Password)}
     ).
 
 %% @doc Signs up to a specific authentication scope.
@@ -51,15 +69,15 @@ signin(Connection, User, Pass) ->
     Namespace :: string(),
     Database :: string(),
     Scope :: string(),
-    Email :: string(),
+    Username :: string(),
     Password :: string()
 ) ->
     surreal_response:result().
-signup(Connection, Namespace, Database, Scope, Email, Password) ->
+signup(Connection, Namespace, Database, Scope, Username, Password) ->
     gen_server:call(
         Connection,
         {signup, unicode:characters_to_binary(Namespace), unicode:characters_to_binary(Database),
-            unicode:characters_to_binary(Scope), unicode:characters_to_binary(Email),
+            unicode:characters_to_binary(Scope), unicode:characters_to_binary(Username),
             unicode:characters_to_binary(Password)}
     ).
 
