@@ -19,7 +19,7 @@ This library tries to be compatible with the [official implementation.](https://
 Add `surreal` to your list of dependencies in `rebar.config` file:
 
 ```erlang
-{deps, [{surreal, "1.0.1"}]}.
+{deps, [{surreal, "1.1.0"}]}.
 ```
 
 ## Usage
