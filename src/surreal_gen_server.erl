@@ -59,6 +59,12 @@ handle_call({authenticate, Token}, _From, Connection) ->
 handle_call({invalidate}, _From, Connection) ->
     Response = send_payload(Connection, <<"invalidate">>, []),
     {reply, Response, Connection};
+handle_call({set, Name, Value}, _From, Connection) ->
+    Response = send_payload(Connection, <<"let">>, [Name, Value]),
+    {reply, Response, Connection};
+handle_call({unset, Name}, _From, Connection) ->
+    Response = send_payload(Connection, <<"unset">>, [Name]),
+    {reply, Response, Connection};
 handle_call({use, Namespace, Database}, _From, Connection) ->
     Response = send_payload(Connection, <<"use">>, [Namespace, Database]),
     {reply, Response, Connection};
