@@ -84,11 +84,11 @@ handle_call({create, TableOrId, Data}, _From, Connection) ->
 handle_call({update, TableOrId, Data}, _From, Connection) ->
     Response = send_payload(Connection, <<"update">>, [TableOrId, Data]),
     {reply, Response, Connection};
-handle_call({change, TableOrId, Data}, _From, Connection) ->
-    Response = send_payload(Connection, <<"change">>, [TableOrId, Data]),
+handle_call({merge, TableOrId, Data}, _From, Connection) ->
+    Response = send_payload(Connection, <<"merge">>, [TableOrId, Data]),
     {reply, Response, Connection};
-handle_call({modify, TableOrId, Data}, _From, Connection) ->
-    Response = send_payload(Connection, <<"modify">>, [TableOrId, Data]),
+handle_call({patch, TableOrId, Data}, _From, Connection) ->
+    Response = send_payload(Connection, <<"patch">>, [TableOrId, Data]),
     {reply, Response, Connection};
 handle_call({delete, TableOrId}, _From, Connection) ->
     Response = send_payload(Connection, <<"delete">>, [TableOrId]),

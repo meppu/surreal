@@ -17,10 +17,13 @@
     select/2,
     create/3,
     update/3,
-    change/3,
-    modify/3,
+    merge/3,
+    patch/3,
     delete/2,
-    close/1
+    close/1,
+    %% Deprecated functions
+    change/3,
+    modify/3
 ]).
 
 %% @doc Connects to a local or remote database endpoint.
@@ -163,21 +166,21 @@ update(Connection, TableOrId, Data) ->
     ).
 
 %% @doc Change all records in a table, or a specific record.
--spec change(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
+-spec merge(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
     surreal_response:result().
-change(Connection, TableOrId, Data) ->
+merge(Connection, TableOrId, Data) ->
     gen_server:call(
         Connection,
-        {change, unicode:characters_to_binary(TableOrId), Data}
+        {merge, unicode:characters_to_binary(TableOrId), Data}
     ).
 
 %% @doc Applies JSON Patch changes to all records in a table, or a specific record.
--spec modify(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
+-spec patch(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
     surreal_response:result().
-modify(Connection, TableOrId, Data) ->
+patch(Connection, TableOrId, Data) ->
     gen_server:call(
         Connection,
-        {modify, unicode:characters_to_binary(TableOrId), Data}
+        {patch, unicode:characters_to_binary(TableOrId), Data}
     ).
 
 %% @doc Deletes all records in a table, or a specific record, from the database.
@@ -193,3 +196,27 @@ delete(Connection, TableOrId) ->
 -spec close(Connection :: gen_server:server_ref()) -> shutdown_ok.
 close(Connection) ->
     gen_server:call(Connection, {stop}).
+
+%%% -----------------------------------
+%%% Following functions are deprecated.
+%%% -----------------------------------
+
+%% @doc Change all records in a table, or a specific record.
+%% @deprecated Please use {@link surreal:merge/3} instead.
+-spec change(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
+    surreal_response:result().
+change(Connection, TableOrId, Data) ->
+    gen_server:call(
+        Connection,
+        {merge, unicode:characters_to_binary(TableOrId), Data}
+    ).
+
+%% @doc Applies JSON Patch changes to all records in a table, or a specific record.
+%% @deprecated Please use {@link surreal:patch/3} instead.
+-spec modify(Connection :: gen_server:server_ref(), TableOrId :: string(), Data :: map()) ->
+    surreal_response:result().
+modify(Connection, TableOrId, Data) ->
+    gen_server:call(
+        Connection,
+        {patch, unicode:characters_to_binary(TableOrId), Data}
+    ).
