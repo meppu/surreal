@@ -20,23 +20,35 @@ init([Url]) ->
 %%% Following handlers are for database management.
 %%% -----------------------------------------------
 
-handle_call({signin, User, Pass}, _From, Connection) ->
+handle_call({signin, Username, Password}, _From, Connection) ->
     Response = send_payload(Connection, <<"signin">>, [
         #{
-            <<"user">> => User,
-            <<"pass">> => Pass
+            <<"user">> => Username,
+            <<"pass">> => Password
         }
     ]),
 
     {reply, Response, Connection};
-handle_call({signup, Namespace, Database, Scope, Email, Password}, _From, Connection) ->
+handle_call({signin, Namespace, Database, Scope, Username, Password}, _From, Connection) ->
+    Response = send_payload(Connection, <<"signin">>, [
+        #{
+            <<"NS">> => Namespace,
+            <<"DB">> => Database,
+            <<"SC">> => Scope,
+            <<"username">> => Username,
+            <<"password">> => Password
+        }
+    ]),
+
+    {reply, Response, Connection};
+handle_call({signup, Namespace, Database, Scope, Username, Password}, _From, Connection) ->
     Response = send_payload(Connection, <<"signup">>, [
         #{
             <<"NS">> => Namespace,
             <<"DB">> => Database,
             <<"SC">> => Scope,
-            <<"email">> => Email,
-            <<"pass">> => Password
+            <<"username">> => Username,
+            <<"password">> => Password
         }
     ]),
 
