@@ -27,6 +27,7 @@ surreal_test() ->
 
     Should1And3 = {ok, #{<<"id">> => <<"testing:wow">>, <<"name">> => <<"kekw">>}},
     Should2 = {ok, [#{<<"id">> => <<"testing:wow">>, <<"name">> => <<"kekw">>}]},
+    Should4 = {ok, [#{<<"id">> => <<"testing:muchwow">>, <<"value">> => <<"test value">>}]},
 
     Result1 = surreal:create(Pid, "testing:wow", #{
         <<"name">> => <<"kekw">>
@@ -37,7 +38,12 @@ surreal_test() ->
     ?assertEqual(Result2, Should2),
 
     Result3 = surreal:delete(Pid, "testing:wow"),
-    ?assertEqual(Result3, Should1And3).
+    ?assertEqual(Result3, Should1And3),
+
+    surreal:set(Pid, "example", <<"test value">>),
+    [Result4] = surreal:query(Pid, "CREATE testing:muchwow SET value = $example"),
+
+    ?assertEqual(Result4, Should4).
 
 query_test() ->
     Query1 = [

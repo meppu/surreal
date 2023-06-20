@@ -6,9 +6,12 @@
     start_link/1,
     start/1,
     signin/3,
+    signin/6,
     signup/6,
     authenticate/2,
     invalidate/1,
+    set/3,
+    unset/2,
     use/3,
     query/3, query/2,
     select/2,
@@ -92,6 +95,17 @@ authenticate(Connection, Token) ->
     surreal_response:result().
 invalidate(Connection) ->
     gen_server:call(Connection, {invalidate}).
+
+%% @doc Assigns a value as a parameter for this connection.
+-spec set(Connection :: gen_server:server_ref(), Name :: string(), Value :: term()) ->
+    surreal_response:result().
+set(Connection, Name, Value) ->
+    gen_server:call(Connection, {set, unicode:characters_to_binary(Name), Value}).
+
+%% @doc	Removes a parameter for this connection
+-spec unset(Connection :: gen_server:server_ref(), Name :: string()) -> surreal_response:result().
+unset(Connection, Name) ->
+    gen_server:call(Connection, {unset, unicode:characters_to_binary(Name)}).
 
 %% @doc Switch to a specific namespace and database.
 -spec use(Connection :: gen_server:server_ref(), Namespace :: string(), Database :: string()) ->
