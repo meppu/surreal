@@ -1,12 +1,10 @@
 {application, surreal, [
     {description, "Erlang driver for SurrealDB"},
-    {vsn, "1.1.0"},
+    {vsn, "2.0.0"},
     {registered, []},
     {applications, [
         kernel,
-        stdlib,
-        websocket_client,
-        jiffy
+        stdlib
     ]},
     {env, []},
     {modules, []},
