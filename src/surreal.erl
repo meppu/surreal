@@ -9,7 +9,8 @@
     invalidate/1,
     query/3,
     select/2,
-    create/3
+    create/3,
+    insert/3
 ]).
 
 %%%-------------------------------------------------------------------------
@@ -102,4 +103,13 @@ create(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
 
     {ok, Response} = surreal_connection:send_message(Pid, <<"create">>, Params),
+    surreal_result:get_method_result(Response).
+
+%% @doc Inserts one or multiple records in the database.
+-spec insert(surreal_pid(), Thing :: string(), Data :: map() | list(map())) ->
+    surreal_result:result().
+insert(Pid, Thing, Data) ->
+    Params = [unicode:characters_to_binary(Thing), Data],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"insert">>, Params),
     surreal_result:get_method_result(Response).
