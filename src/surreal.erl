@@ -5,7 +5,8 @@
     start_link/2,
     signin/3,
     use/3,
-    authenticate/2
+    authenticate/2,
+    invalidate/1
 ]).
 
 %%%-------------------------------------------------------------------------
@@ -67,4 +68,10 @@ authenticate(Pid, Token) ->
     Params = [unicode:characters_to_binary(Token)],
 
     {ok, Response} = surreal_connection:send_message(Pid, <<"authenticate">>, Params),
+    surreal_result:get_method_result(Response).
+
+%% @doc Invalidates the authentication for the current connection
+-spec invalidate(surreal_pid()) -> surreal_result:result().
+invalidate(Pid) ->
+    {ok, Response} = surreal_connection:send_message(Pid, <<"invalidate">>, null),
     surreal_result:get_method_result(Response).
