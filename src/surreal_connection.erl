@@ -7,7 +7,7 @@
     %% Client
     %% =======
     start_link/2,
-    send_message/4,
+    send_message/3,
     %% =======
     %% Server
     %% =======
@@ -29,16 +29,13 @@
 start_link(Config, ConnName) ->
     gen_server:start_link({local, ConnName}, ?MODULE, [Config], []).
 
--spec send_message(Pid, Id, Method, Params) ->
-    surreal_result:result() | list(surreal_result:result())
-when
+-spec send_message(Pid, Method, Params) -> surreal_result:result() when
     Pid :: gen_server:server_ref(),
-    Id :: binary(),
     Method :: binary(),
     Params :: list(term()).
-send_message(Pid, Id, Method, Params) ->
+send_message(Pid, Method, Params) ->
     Payload = #{
-        <<"id">> => Id,
+        <<"id">> => base64:encode(crypto:strong_rand_bytes(10)),
         <<"method">> => Method,
         <<"params">> => Params
     },

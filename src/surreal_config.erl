@@ -1,33 +1,26 @@
 -module(surreal_config).
 
 -export([parse/1]).
--export_type([connection_map/0, uri/0, ok/0, error/0]).
+-export_type([connection_map/0]).
 
 %%%-------------------------------------------------------------------------
 %%% Public connection configuration type
 %%%-------------------------------------------------------------------------
 -type connection_map() :: #{
-    host => unicode:chardata(),
-    username => unicode:chardata(),
-    password => unicode:chardata(),
-    namespace => unicode:chardata(),
-    database => unicode:chardata(),
+    host => string(),
+    username => string(),
+    password => string(),
+    namespace => string(),
+    database => string(),
     port => non_neg_integer(),
     tls => boolean()
 }.
 
 %%%-------------------------------------------------------------------------
-%%% Public types for configuration input/output
-%%%-------------------------------------------------------------------------
--type uri() :: iodata().
-
--type ok() :: {ok, connection_map()}.
--type error() :: {error, atom(), term()}.
-
-%%%-------------------------------------------------------------------------
 %%% Public functions
 %%%-------------------------------------------------------------------------
--spec parse(uri()) -> ok() | error().
+%% @doc Parse SurrealDB URI.
+-spec parse(Uri :: iodata()) -> {ok, connection_map()} | {error, atom(), term()}.
 parse(Uri) ->
     case uri_string:parse(Uri) of
         #{
@@ -41,7 +34,7 @@ parse(Uri) ->
             {ok, [Username, Password]} = parse_userinfo(UserInfo),
             {ok, [Namespace, Database]} = parse_path(Path),
 
-            #{
+            {ok, #{
                 host => Host,
                 path => Path,
                 username => Username,
@@ -50,7 +43,7 @@ parse(Uri) ->
                 database => Database,
                 port => Port,
                 tls => Tls
-            };
+            }};
         {error, _, _} = Error ->
             Error;
         _ ->

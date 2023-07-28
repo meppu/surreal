@@ -10,7 +10,8 @@
 -type query_error() :: {error, atom() | binary()}.
 -type ok() :: {ok, term()}.
 
--type result() :: server_error() | query_error() | ok().
+-type inner_result() :: server_error() | query_error() | ok().
+-type result() :: inner_result() | list(inner_result()).
 
 %%%-------------------------------------------------------------------------
 %%% Undocumented public functions
