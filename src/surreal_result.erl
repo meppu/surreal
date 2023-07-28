@@ -22,7 +22,7 @@ to_result(#{<<"time">> := _Time, <<"status">> := <<"ERR">>, <<"detail">> := Mess
     {error, Message};
 to_result(#{<<"time">> := _Time, <<"status">> := <<"OK">>, <<"result">> := Result}) ->
     {ok, Result};
-to_result(#{<<"result">> := Result})->
+to_result(#{<<"result">> := Result}) ->
     {ok, Result};
 to_result(Other) ->
     {ok, Other}.
