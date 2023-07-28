@@ -4,7 +4,8 @@
 -export([
     start_link/2,
     signin/3,
-    use/3
+    use/3,
+    authenticate/2
 ]).
 
 %%%-------------------------------------------------------------------------
@@ -48,10 +49,22 @@ signin(Pid, Username, Password) ->
             <<"pass">> => unicode:characters_to_binary(Password)
         }
     ],
-    surreal_connection:send_message(Pid, <<"signin">>, Params).
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"signin">>, Params),
+    surreal_result:get_method_result(Response).
 
 %% @doc Switch to a specific namespace and database.
 -spec use(surreal_pid(), Namespace :: string(), Database :: string()) -> surreal_result:result().
 use(Pid, Namespace, Database) ->
     Params = [unicode:characters_to_binary(Namespace), unicode:characters_to_binary(Database)],
-    surreal_connection:send_message(Pid, <<"use">>, Params).
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"use">>, Params),
+    surreal_result:get_method_result(Response).
+
+%% @doc Authenticates the current connection with a JWT token.
+-spec authenticate(surreal_pid(), Token :: string()) -> surreal_result:result().
+authenticate(Pid, Token) ->
+    Params = [unicode:characters_to_binary(Token)],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"authenticate">>, Params),
+    surreal_result:get_method_result(Response).

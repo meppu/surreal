@@ -50,7 +50,7 @@ send_message(Pid, Method, Params) ->
 
     receive
         {'DOWN', MonitorReference, process, ChildPid, {ok, Response}} ->
-            surreal_result:to_result(Response)
+            {ok, Response}
     after 5000 ->
         exit(ChildPid, kill),
         {error, timeout}
