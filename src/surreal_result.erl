@@ -22,11 +22,13 @@ get_query_result(#{<<"error">> := #{<<"code">> := Code, <<"message">> := Message
 get_query_result(#{<<"time">> := _Time, <<"status">> := <<"ERR">>, <<"detail">> := Message}) ->
     {error, Message};
 get_query_result(#{<<"time">> := _Time, <<"status">> := <<"OK">>, <<"result">> := Result}) ->
-    {ok, Result}.
+    {ok, Result};
+get_query_result(List) when is_list(List) ->
+    lists:map(fun get_query_result/1, List).
 
 %% @private
 get_method_result(#{<<"error">> := #{<<"code">> := Code, <<"message">> := Message}}) ->
-  {error, Code, Message};
+    {error, Code, Message};
 get_method_result(#{<<"result">> := [Result]}) ->
     {ok, Result};
 get_method_result(#{<<"result">> := Result}) ->
