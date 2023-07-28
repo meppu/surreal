@@ -1,13 +1,16 @@
+%% @private
 -module(surreal_connection).
 -behaviour(gen_server).
 
 -export([
+    %% =======
     %% Client
-    %% ======
+    %% =======
     start_link/2,
     send_message/4,
+    %% =======
     %% Server
-    %% ======
+    %% =======
     init/1,
     handle_call/3,
     handle_cast/2,
@@ -15,18 +18,20 @@
     terminate/2
 ]).
 
-%%==========================================================================
-%%
-%%   Client
-%%
-%%==========================================================================
+%%%==========================================================================
+%%%
+%%%   Client
+%%%
+%%%==========================================================================
 -spec start_link(Config, ConnName) -> gen_server:start_ret() when
     Config :: surreal_config:connection_map(),
     ConnName :: atom().
 start_link(Config, ConnName) ->
     gen_server:start_link({local, ConnName}, ?MODULE, [Config], []).
 
--spec send_message(Pid, Id, Method, Params) -> map() when
+-spec send_message(Pid, Id, Method, Params) ->
+    surreal_result:result() | list(surreal_result:result())
+when
     Pid :: gen_server:server_ref(),
     Id :: binary(),
     Method :: binary(),
@@ -43,28 +48,26 @@ send_message(Pid, Id, Method, Params) ->
 
         receive
             Data -> exit({ok, Data})
-        after 5000 ->
-            exit({error, timeout})
         end
     end),
 
     receive
-        {'DOWN', MonitorReference, process, ChildPid, {ok, Response} = Value} ->
-            io:format("~p~n", [Response]),
-            Value;
-        {'DOWN', MonitorReference, process, ChildPid, Other} ->
-            Other
+        {'DOWN', MonitorReference, process, ChildPid, {ok, Response}} ->
+            surreal_result:to_result(Response)
+    after 5000 ->
+        exit(ChildPid, kill),
+        {error, timeout}
     end.
 
-%%==========================================================================
-%%
-%%   Server
-%%
-%%==========================================================================
+%%%==========================================================================
+%%%
+%%%   Server
+%%%
+%%%==========================================================================
 
-%%-------------------------------------------------------------------------
-%% Initialise callback for generic server behaviour
-%%-------------------------------------------------------------------------
+%%%-------------------------------------------------------------------------
+%%% Initialise callback for generic server behaviour
+%%%-------------------------------------------------------------------------
 init([#{host := Host, port := Port, tls := Tls}]) ->
     % Ensure gun is running
     {ok, _List} = application:ensure_all_started(gun),
@@ -98,9 +101,9 @@ init([#{host := Host, port := Port, tls := Tls}]) ->
         {error, timeout}
     end.
 
-%%-------------------------------------------------------------------------
-%% Handle call for server
-%%-------------------------------------------------------------------------
+%%%-------------------------------------------------------------------------
+%%% Handle call for server
+%%%-------------------------------------------------------------------------
 handle_call(
     {send, #{<<"id">> := PacketId} = Packet}, {Client, _Tag}, {ConnPid, StreamRef, Table} = State
 ) ->
@@ -113,15 +116,15 @@ handle_call(
 handle_call(stop, _From, State) ->
     {stop, normal, State}.
 
-%%-------------------------------------------------------------------------
-%% Handle cast for server
-%%-------------------------------------------------------------------------
+%%%-------------------------------------------------------------------------
+%%% Handle cast for server
+%%%-------------------------------------------------------------------------
 handle_cast(_Message, State) ->
     {noreply, State}.
 
-%%-------------------------------------------------------------------------
-%% Handle messages that directly sent to pid
-%%-------------------------------------------------------------------------
+%%%-------------------------------------------------------------------------
+%%% Handle messages that directly sent to pid
+%%%-------------------------------------------------------------------------
 handle_info({gun_ws, ConnPid, StreamRef, {text, Packet}}, {_ConnPid, _StreamRef, Table}) ->
     #{<<"id">> := PacketId} = PacketDecoded = jsx:decode(Packet),
 
@@ -134,9 +137,9 @@ handle_info({gun_ws, ConnPid, StreamRef, {text, Packet}}, {_ConnPid, _StreamRef,
 
     {noreply, {ConnPid, StreamRef, Table}}.
 
-%%-------------------------------------------------------------------------
-%% Handle terminate for server
-%%-------------------------------------------------------------------------
+%%%-------------------------------------------------------------------------
+%%% Handle terminate for server
+%%%-------------------------------------------------------------------------
 terminate(normal, {ConnPid, _StreamRef, Table}) ->
     ets:delete(Table),
     gun:close(ConnPid).
