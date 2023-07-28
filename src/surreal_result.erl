@@ -29,8 +29,6 @@ get_query_result(List) when is_list(List) ->
 %% @private
 get_method_result(#{<<"error">> := #{<<"code">> := Code, <<"message">> := Message}}) ->
     {error, Code, Message};
-get_method_result(#{<<"result">> := [Result]}) ->
-    {ok, Result};
 get_method_result(#{<<"result">> := Result}) ->
     {ok, Result};
 get_method_result(Other) ->

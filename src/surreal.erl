@@ -7,7 +7,9 @@
     use/3,
     authenticate/2,
     invalidate/1,
-    query/3
+    query/3,
+    select/2,
+    create/3
 ]).
 
 %%%-------------------------------------------------------------------------
@@ -85,3 +87,19 @@ query(Pid, Query, Variables) ->
     {ok, Response} = surreal_connection:send_message(Pid, <<"query">>, Params),
     {ok, Result} = surreal_result:get_method_result(Response),
     surreal_result:get_query_result(Result).
+
+%% @doc Selects all records in a table, or a specific record.
+-spec select(surreal_pid(), Thing :: string()) -> surreal_result:result().
+select(Pid, Thing) ->
+    Params = [unicode:characters_to_binary(Thing)],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"select">>, Params),
+    surreal_result:get_method_result(Response).
+
+%% @doc Creates a record in the database.
+-spec create(surreal_pid(), Thing :: string(), Data :: map() | null) -> surreal_result:result().
+create(Pid, Thing, Data) ->
+    Params = [unicode:characters_to_binary(Thing), Data],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"create">>, Params),
+    surreal_result:get_method_result(Response).
