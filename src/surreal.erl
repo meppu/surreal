@@ -16,7 +16,9 @@
     select/2,
     create/3,
     insert/3,
-    update/3
+    update/3,
+    merge/3,
+    patch/3
 ]).
 
 %%%==========================================================================
@@ -219,9 +221,8 @@ insert(Pid, Thing, Data) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Updates all records in a table, or a specific record, in the database.
+%% This function replaces the current document / record data with the specified data.
 %%
-%% ***NOTE: This function replaces the current document / record data with the specified data.***
-%% 
 %% ```
 %1> NewData = #{<<"name">> => <<"meppu">>, <<"identify">> => <<"human">>}.
 %%  % #{<<"identify">> => <<"human">>,<<"name">> => <<"meppu">>}
@@ -231,9 +232,53 @@ insert(Pid, Thing, Data) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec update(surreal_pid(), Thing :: string(), Data :: map() | null) -> surreal_result:result().
+-spec update(surreal_pid(), Thing :: string(), NewData :: map() | null) -> surreal_result:result().
 update(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
 
     {ok, Response} = surreal_connection:send_message(Pid, <<"update">>, Params),
+    surreal_result:get_method_result(Response).
+
+%%-------------------------------------------------------------------------
+%% @doc Modifies all records in a table, or a specific record, in the database.
+%% This function merges the current document / record data with the specified data.
+%%
+%% ```
+%1> MergeData = #{<<"score">> => 10}.
+%%  % #{<<"score">> => 10}
+%2> {ok, Updated} = surreal:merge(Pid, "users:meppu", MergeData).
+%%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"human">>,
+%%  %       <<"name">> => <<"meppu">>,<<"score">> => 10}}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec merge(surreal_pid(), Thing :: string(), Data :: map() | null) -> surreal_result:result().
+merge(Pid, Thing, Data) ->
+    Params = [unicode:characters_to_binary(Thing), Data],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"merge">>, Params),
+    surreal_result:get_method_result(Response).
+
+%%-------------------------------------------------------------------------
+%% @doc Applies JSON Patch changes to all records, or a specific record, in the database.
+%% This function patches the current document / record data with the specified JSON Patch data.
+%%
+%% ```
+%1> Patches = [{replace, "/name", <<"tuhana">>}, {remove, "/score"}].
+%%  % [{replace,"/name",<<"tuhana">>},{remove,"/score"}]
+%2> surreal:patch(database, "users:meppu", Patches).
+%%  % {ok,[#{<<"op">> => <<"remove">>,<<"path">> => <<"/score">>,
+%%  %        <<"value">> => null},
+%%  %      #{<<"op">> => <<"change">>,<<"path">> => <<"/name">>,
+%%  %        <<"value">> => <<"@@ -1,5 +1,6 @@\n-meppu\n+tuhana\n">>}]}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec patch(surreal_pid(), Thing, JSONPatch) -> surreal_result:result() when
+    Thing :: string(),
+    JSONPatch :: list(surreal_patch:patch()) | null.
+patch(Pid, Thing, JSONPatch) ->
+    Params = [unicode:characters_to_binary(Thing), surreal_patch:convert(JSONPatch)],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"patch">>, Params),
     surreal_result:get_method_result(Response).
