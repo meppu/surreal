@@ -1,4 +1,9 @@
+%%%-------------------------------------------------------------------------
+%%% @copyright (C) 2023, meppu
 %%% @doc Erlang driver for SurrealDB.
+%%% @author meppu
+%%% @end
+%%%-------------------------------------------------------------------------
 -module(surreal).
 
 -export([
@@ -13,9 +18,12 @@
     insert/3
 ]).
 
-%%%-------------------------------------------------------------------------
-%%% Private types
-%%%-------------------------------------------------------------------------
+%%%==========================================================================
+%%%
+%%%   Private types
+%%%
+%%%==========================================================================
+
 -type surreal_pid() :: gen_server:server_ref().
 
 %%%==========================================================================
@@ -24,7 +32,19 @@
 %%%
 %%%==========================================================================
 
+%%-------------------------------------------------------------------------
 %% @doc Connects to a local or remote database endpoint.
+%%
+%% `Url' must be a valid SurrealDB URI. Visit {@link surreal_config. surreal_config module} for more information.
+%%
+%% `ConnName' allows you to set a name for connection so you can use given name instead of pid while using SurrealDB.
+%%
+%% ```
+%1> {ok, Pid} = surreal:start_link("surrealdb://root:root@localhost:8000/google/domains", database).
+%%  % {ok,<0.359.0>}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec start_link(Url :: string(), ConnName :: atom()) -> gen_server:start_ret().
 start_link(Url, ConnName) ->
     {ok,
@@ -45,7 +65,15 @@ start_link(Url, ConnName) ->
             Other
     end.
 
+%%-------------------------------------------------------------------------
 %% @doc Sign in to the database. This is a necessary step before using the database.
+%%
+%% ```
+%1> surreal:signin(Pid, "root", "root").
+%%  % {ok, null}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec signin(surreal_pid(), Username :: string(), Password :: string()) -> surreal_result:result().
 signin(Pid, Username, Password) ->
     Params = [
@@ -58,7 +86,15 @@ signin(Pid, Username, Password) ->
     {ok, Response} = surreal_connection:send_message(Pid, <<"signin">>, Params),
     surreal_result:get_method_result(Response).
 
+%%-------------------------------------------------------------------------
 %% @doc Switch to a specific namespace and database.
+%%
+%% ```
+%1> surreal:use(Pid, "test", "test").
+%%  % {ok, null}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec use(surreal_pid(), Namespace :: string(), Database :: string()) -> surreal_result:result().
 use(Pid, Namespace, Database) ->
     Params = [unicode:characters_to_binary(Namespace), unicode:characters_to_binary(Database)],
@@ -66,7 +102,16 @@ use(Pid, Namespace, Database) ->
     {ok, Response} = surreal_connection:send_message(Pid, <<"use">>, Params),
     surreal_result:get_method_result(Response).
 
+%%-------------------------------------------------------------------------
 %% @doc Authenticates the current connection with a JWT token.
+%%
+%% ```
+%1> Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc...".
+%%  % "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc..."
+%2> surreal:authenticate(Pid, Token).
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec authenticate(surreal_pid(), Token :: string()) -> surreal_result:result().
 authenticate(Pid, Token) ->
     Params = [unicode:characters_to_binary(Token)],
@@ -74,13 +119,30 @@ authenticate(Pid, Token) ->
     {ok, Response} = surreal_connection:send_message(Pid, <<"authenticate">>, Params),
     surreal_result:get_method_result(Response).
 
+%%-------------------------------------------------------------------------
 %% @doc Invalidates the authentication for the current connection.
+%%
+%% ```
+%1> surreal:invalidate(Pid).
+%%  % {ok, null}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec invalidate(surreal_pid()) -> surreal_result:result().
 invalidate(Pid) ->
     {ok, Response} = surreal_connection:send_message(Pid, <<"invalidate">>, null),
     surreal_result:get_method_result(Response).
 
+%%-------------------------------------------------------------------------
 %% @doc Runs a set of SurrealQL statements against the database.
+%%
+%% ```
+%1> [{ok, Result}] = surreal:query(Pid, "SELECT * FROM authorised WHERE user = $user", #{<<"user">> => <<"A">>}).
+%%  % [{ok,[#{<<"id">> => <<"authorised:3n4mn5wsq823i7pgv9un">>,
+%%  %        <<"user">> => <<"A">>}]}]
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec query(surreal_pid(), Query :: string(), Variables :: map()) -> surreal_result:result().
 query(Pid, Query, Variables) ->
     Params = [unicode:characters_to_binary(Query), Variables],
@@ -89,7 +151,21 @@ query(Pid, Query, Variables) ->
     {ok, Result} = surreal_result:get_method_result(Response),
     surreal_result:get_query_result(Result).
 
+%%-------------------------------------------------------------------------
 %% @doc Selects all records in a table, or a specific record.
+%%
+%% ```
+%1> {ok, Result} = surreal:select(Pid, "authorised").
+%%  % {ok,[#{<<"id">> => <<"authorised:3n4mn5wsq823i7pgv9un">>,
+%%  %        <<"user">> => <<"A">>},
+%%  %      #{<<"id">> => <<"authorised:raedq65doxhpuc6t3meo">>,
+%%  %        <<"user">> => <<"B">>}]}
+%2> {ok, Result2} = surreal:select(Pid, "users:meppu").
+%%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"cat">>,
+%%  %       <<"name">> => <<"meppu">>}}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec select(surreal_pid(), Thing :: string()) -> surreal_result:result().
 select(Pid, Thing) ->
     Params = [unicode:characters_to_binary(Thing)],
@@ -97,7 +173,18 @@ select(Pid, Thing) ->
     {ok, Response} = surreal_connection:send_message(Pid, <<"select">>, Params),
     surreal_result:get_method_result(Response).
 
+%%-------------------------------------------------------------------------
 %% @doc Creates a record in the database.
+%%
+%% ```
+%1> User = #{<<"name">> => <<"meppu">>, <<"identify">> => <<"cat">>}.
+%%  % #{<<"identify">> => <<"cat">>,<<"name">> => <<"meppu">>}
+%2> {ok, Created} = surreal:create(Pid, "users:meppu", User).
+%%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"cat">>,
+%%  %       <<"name">> => <<"meppu">>}}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec create(surreal_pid(), Thing :: string(), Data :: map() | null) -> surreal_result:result().
 create(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
@@ -105,9 +192,24 @@ create(Pid, Thing, Data) ->
     {ok, Response} = surreal_connection:send_message(Pid, <<"create">>, Params),
     surreal_result:get_method_result(Response).
 
+%%-------------------------------------------------------------------------
+%% @since 2.0.0
 %% @doc Inserts one or multiple records in the database.
--spec insert(surreal_pid(), Thing :: string(), Data :: map() | list(map())) ->
-    surreal_result:result().
+%%
+%% ```
+%1> AuthorisedUsers = [#{<<"user">> => <<"A">>}, #{<<"user">> => <<"B">>}].
+%%  % [#{<<"user">> => <<"A">>},#{<<"user">> => <<"B">>}]
+%2> {ok, Created} = surreal:insert(Pid, "authorised", AuthorisedUsers).
+%%  % {ok,[#{<<"id">> => <<"authorised:3n4mn5wsq823i7pgv9un">>,
+%%  %        <<"user">> => <<"A">>},
+%%  %      #{<<"id">> => <<"authorised:raedq65doxhpuc6t3meo">>,
+%%  %        <<"user">> => <<"B">>}]}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec insert(surreal_pid(), Thing, Data) -> surreal_result:result() when
+    Thing :: string(),
+    Data :: map() | list(map()).
 insert(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
 

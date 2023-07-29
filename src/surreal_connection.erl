@@ -1,16 +1,16 @@
-%% @private
+%%% @private
 -module(surreal_connection).
 -behaviour(gen_server).
 
 -export([
-    %% =======
+    %%==============
     %% Client
-    %% =======
+    %%==============
     start_link/2,
     send_message/3,
-    %% =======
+    %%==============
     %% Server
-    %% =======
+    %%==============
     init/1,
     handle_call/3,
     handle_cast/2,
@@ -23,6 +23,7 @@
 %%%   Client
 %%%
 %%%==========================================================================
+
 -spec start_link(Config, ConnName) -> gen_server:start_ret() when
     Config :: surreal_config:connection_map(),
     ConnName :: atom().
@@ -62,9 +63,6 @@ send_message(Pid, Method, Params) ->
 %%%
 %%%==========================================================================
 
-%%%-------------------------------------------------------------------------
-%%% Initialise callback for generic server behaviour
-%%%-------------------------------------------------------------------------
 init([#{host := Host, port := Port, tls := Tls}]) ->
     % Ensure gun is running
     {ok, _List} = application:ensure_all_started(gun),
@@ -98,9 +96,6 @@ init([#{host := Host, port := Port, tls := Tls}]) ->
         {error, timeout}
     end.
 
-%%%-------------------------------------------------------------------------
-%%% Handle call for server
-%%%-------------------------------------------------------------------------
 handle_call(
     {send, #{<<"id">> := PacketId} = Packet}, {Client, _Tag}, {ConnPid, StreamRef, Table} = State
 ) ->
@@ -113,20 +108,15 @@ handle_call(
 handle_call(stop, _From, State) ->
     {stop, normal, State}.
 
-%%%-------------------------------------------------------------------------
-%%% Handle cast for server
-%%%-------------------------------------------------------------------------
 handle_cast(_Message, State) ->
     {noreply, State}.
 
-%%%-------------------------------------------------------------------------
-%%% Handle messages that directly sent to pid
-%%%-------------------------------------------------------------------------
 handle_info({gun_ws, ConnPid, StreamRef, {text, Packet}}, {_ConnPid, _StreamRef, Table}) ->
     #{<<"id">> := PacketId} = PacketDecoded = jsx:decode(Packet),
 
     case ets:lookup(Table, PacketId) of
         [{PacketId, Pid} | _Other] ->
+            ets:delete(Table, PacketId),
             Pid ! PacketDecoded;
         _ ->
             noop
@@ -134,9 +124,6 @@ handle_info({gun_ws, ConnPid, StreamRef, {text, Packet}}, {_ConnPid, _StreamRef,
 
     {noreply, {ConnPid, StreamRef, Table}}.
 
-%%%-------------------------------------------------------------------------
-%%% Handle terminate for server
-%%%-------------------------------------------------------------------------
 terminate(normal, {ConnPid, _StreamRef, Table}) ->
     ets:delete(Table),
     gun:close(ConnPid).

@@ -1,11 +1,60 @@
+%%%-------------------------------------------------------------------------
+%%% @copyright (C) 2023, meppu
+%%% @doc Connection configuration module for SurrealDB driver.
+%%%
+%%% == SurrealDB URI Format ==
+%%%
+%%% The SurrealDB URI format is an unofficial way to represent connection information
+%%% for accessing SurrealDB. It allows users to define various parameters necessary
+%%% for establishing a connection to the database server. The URI format follows the format:
+%%%
+%%% - <strong>Plain TCP</strong>:
+%%%   `surrealdb://username:password@host:port/namespace/database'
+%%%
+%%% - <strong>TLS</strong>:
+%%%   `surrealdb+tls://username:password@host:port/namespace/database'
+%%%
+%%% === Scheme ===
+%%%
+%%%     This is the scheme used to identify SurrealDB connections. The optional "tls" part
+%%%     indicates that the connection should be made over TLS (Transport Layer Security),
+%%%     providing a secure and encrypted communication channel.
+%%%
+%%% === Credentials ===
+%%%
+%%%     The username and password to authenticate with the SurrealDB server.
+%%%
+%%% === Host ===
+%%%
+%%%     The hostname or IP address of the SurrealDB server.
+%%%
+%%% === Namespace ===
+%%%
+%%%     The name of the SurrealDB namespace that you want to use.
+%%%
+%%% === Database ===
+%%%
+%%%     The name of the SurrealDB database that you want to use.
+%%%
+%%% == Example URI ==
+%%%
+%%% <strong>Default for SurrealDB</strong>:
+%%% `surrealdb://root:root@localhost:8000/test/test'
+%%%
+%%% @author meppu
+%%% @end
+%%%-------------------------------------------------------------------------
 -module(surreal_config).
 
 -export([parse/1]).
 -export_type([connection_map/0]).
 
-%%%-------------------------------------------------------------------------
-%%% Public connection configuration type
-%%%-------------------------------------------------------------------------
+%%%==========================================================================
+%%%
+%%%   Public types
+%%%
+%%%==========================================================================
+
 -type connection_map() :: #{
     host => string(),
     username => string(),
@@ -16,10 +65,23 @@
     tls => boolean()
 }.
 
-%%%-------------------------------------------------------------------------
-%%% Public functions
-%%%-------------------------------------------------------------------------
+%%%==========================================================================
+%%%
+%%%   Public functions
+%%%
+%%%==========================================================================
+
+%%-------------------------------------------------------------------------
 %% @doc Parse SurrealDB URI.
+%%
+%% ```
+%1> surreal_config:parse("surrealdb://root:root@localhost:8000/test/test").
+%%  % {ok,#{database => "test",host => "localhost",namespace => "test",
+%%  %       password => "root",path => "/test/test",port => 8000,
+%%  %       tls => false,username => "root"}}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
 -spec parse(Uri :: iodata()) -> {ok, connection_map()} | {error, atom(), term()}.
 parse(Uri) ->
     case uri_string:parse(Uri) of
@@ -50,9 +112,12 @@ parse(Uri) ->
             {error, invalid_uri, []}
     end.
 
-%%%-------------------------------------------------------------------------
-%%% Private functions
-%%%-------------------------------------------------------------------------
+%%%==========================================================================
+%%%
+%%%   Private functions
+%%%
+%%%==========================================================================
+
 %% @private
 parse_userinfo(UserInfo) ->
     case string:split(UserInfo, ":", all) of
