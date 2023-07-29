@@ -15,7 +15,8 @@
     query/3,
     select/2,
     create/3,
-    insert/3
+    insert/3,
+    update/3
 ]).
 
 %%%==========================================================================
@@ -214,4 +215,25 @@ insert(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
 
     {ok, Response} = surreal_connection:send_message(Pid, <<"insert">>, Params),
+    surreal_result:get_method_result(Response).
+
+%%-------------------------------------------------------------------------
+%% @doc Updates all records in a table, or a specific record, in the database.
+%%
+%% ***NOTE: This function replaces the current document / record data with the specified data.***
+%% 
+%% ```
+%1> NewData = #{<<"name">> => <<"meppu">>, <<"identify">> => <<"human">>}.
+%%  % #{<<"identify">> => <<"human">>,<<"name">> => <<"meppu">>}
+%2> {ok, Updated} = surreal:update(Pid, "users:meppu", NewData).
+%%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"human">>,
+%%  %       <<"name">> => <<"meppu">>}}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec update(surreal_pid(), Thing :: string(), Data :: map() | null) -> surreal_result:result().
+update(Pid, Thing, Data) ->
+    Params = [unicode:characters_to_binary(Thing), Data],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"update">>, Params),
     surreal_result:get_method_result(Response).
