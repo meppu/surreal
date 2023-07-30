@@ -18,7 +18,8 @@
     insert/3,
     update/3,
     merge/3,
-    patch/3
+    patch/3,
+    delete/2
 ]).
 
 %%%==========================================================================
@@ -281,4 +282,21 @@ patch(Pid, Thing, JSONPatch) ->
     Params = [unicode:characters_to_binary(Thing), surreal_patch:convert(JSONPatch)],
 
     {ok, Response} = surreal_connection:send_message(Pid, <<"patch">>, Params),
+    surreal_result:get_method_result(Response).
+
+%%-------------------------------------------------------------------------
+%% @doc Deletes all records in a table, or a specific record, from the database.
+%%
+%% ```
+%1> {ok, Deleted} = surreal:merge(Pid, "users:meppu").
+%%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"human">>,
+%%  %       <<"name">> => <<"meppu">>,<<"score">> => 10}}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec delete(surreal_pid(), Thing :: string()) -> surreal_result:result().
+delete(Pid, Thing) ->
+    Params = [unicode:characters_to_binary(Thing)],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"delete">>, Params),
     surreal_result:get_method_result(Response).
