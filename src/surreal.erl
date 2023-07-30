@@ -8,6 +8,7 @@
 
 -export([
     start_link/2,
+    start_link/3,
     signin/3,
     signin/2,
     signup/2,
@@ -25,6 +26,40 @@
     set/3,
     unset/2
 ]).
+-export_type([surreal_opts/0]).
+
+%%%==========================================================================
+%%%
+%%%   Public types
+%%%
+%%%==========================================================================
+
+-type surreal_opts() :: #{
+    signin => signin_opts(),
+    use => use_opts()
+}.
+
+-type signin_opts() ::
+    boolean()
+    | (Vars :: map()).
+%% This is used to define options for the signin process.
+%% It provides four possible options:
+%%
+%% <dl>
+%%   <dt>`true'</dt>
+%%   <dd>This is the default option, and it indicates that the signin process is enabled and should be used with the given URL.</dd>
+%%
+%%   <dt>`false'</dt>
+%%   <dd>This option stands for disabling the signin process entirely.</dd>
+%%
+%%   <dt>`(Vars :: map())'</dt>
+%%   <dd>This option provides flexibility for custom signin options.</dd>
+%% </dl>
+
+-type use_opts() :: boolean().
+%% This type represents a boolean value.
+%% It is used to determine whether specific database and namespace settings should be used or not.
+%% Default is `true'.
 
 %%%==========================================================================
 %%%
@@ -41,20 +76,21 @@
 %%%==========================================================================
 
 %%-------------------------------------------------------------------------
-%% @doc Connects to a local or remote database endpoint.
+%% @doc Connects to a local or remote database endpoint with extra options. Pretty much same with {@link surreal:start_link/2. start_link/2} with an extra argument.
 %%
-%% `Url' must be a valid SurrealDB URI. Visit {@link surreal_config. surreal_config module} for more information.
-%%
-%% `ConnName' allows you to set a name for connection so you can use given name instead of pid while using SurrealDB.
+%% - `Opts' allows you to provide custom options.
 %%
 %% ```
-%1> {ok, Pid} = surreal:start_link("surrealdb://root:root@localhost:8000/google/domains", database).
+%1> Url = "surrealdb://root:root@localhost:8000/surrealdb/docs".
+%%  % "surrealdb://root:root@localhost:8000/surrealdb/docs"
+%2> {ok, Pid} = surreal:start_link(Url, database, #{use => false}).
 %%  % {ok,<0.359.0>}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec start_link(Url :: string(), ConnName :: atom()) -> gen_server:start_ret().
-start_link(Url, ConnName) ->
+-spec start_link(Url, ConnName, Opts) -> gen_server:start_ret() when
+    Url :: string(), ConnName :: atom(), Opts :: surreal_opts().
+start_link(Url, ConnName, Opts) ->
     {ok,
         Config = #{
             username := Username,
@@ -65,13 +101,48 @@ start_link(Url, ConnName) ->
 
     case surreal_connection:start_link(Config, ConnName) of
         {ok, Pid} ->
-            {ok, _} = signin(Pid, Username, Password),
-            {ok, _} = use(Pid, Namespace, Database),
+            {ok, _} =
+                case maps:get(signin, Opts, true) of
+                    true ->
+                        signin(Pid, Username, Password);
+                    false ->
+                        {ok, null};
+                    Vars when is_map(Vars) ->
+                        signin(Pid, Vars)
+                end,
+
+            {ok, _} =
+                case maps:get(use, Opts, true) of
+                    true ->
+                        {ok, Token} = use(Pid, Namespace, Database),
+                        authenticate(Pid, Token);
+                    false ->
+                        {ok, null}
+                end,
 
             {ok, Pid};
         Other ->
             Other
     end.
+
+%%-------------------------------------------------------------------------
+%% @doc Connects to a local or remote database endpoint.
+%%
+%% - `Url' must be a valid SurrealDB URI. Visit {@link surreal_config. surreal_config module} for more information.
+%%
+%% - `ConnName' allows you to set a name for connection so you can use given name instead of pid while using SurrealDB.
+%%
+%% ```
+%1> Url = "surrealdb://root:root@localhost:8000/surrealdb/docs".
+%%  % "surrealdb://root:root@localhost:8000/surrealdb/docs"
+%2> {ok, Pid} = surreal:start_link(Url, database).
+%%  % {ok,<0.359.0>}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec start_link(Url :: string(), ConnName :: atom()) -> gen_server:start_ret().
+start_link(Url, ConnName) ->
+    start_link(Url, ConnName, #{}).
 
 %%-------------------------------------------------------------------------
 %% @doc Signs in to the database with username and password.
