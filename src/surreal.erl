@@ -9,6 +9,8 @@
 -export([
     start_link/2,
     signin/3,
+    signin/2,
+    signup/2,
     use/3,
     authenticate/2,
     invalidate/1,
@@ -72,11 +74,11 @@ start_link(Url, ConnName) ->
     end.
 
 %%-------------------------------------------------------------------------
-%% @doc Sign in to the database. This is a necessary step before using the database.
+%% @doc Signs in to the database with username and password.
 %%
 %% ```
 %1> surreal:signin(Pid, "root", "root").
-%%  % {ok, null}
+%%  % {ok,null}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
@@ -93,11 +95,63 @@ signin(Pid, Username, Password) ->
     surreal_result:get_method_result(Response).
 
 %%-------------------------------------------------------------------------
-%% @doc Switch to a specific namespace and database.
+%% @doc Signs in to a root, namespace, database or scope user.
+%%
+%% For more information about `Vars', view
+%% <a href="https://surrealdb.com/docs/integration/websocket/text#signin" target="_blank">SurrealDB documentation</a>
+%% and
+%% <a href="https://surrealdb.com/docs/integration/sdks/nodejs#signin" target="_blank">JavaScript SDK</a>.
+%%
+%% ```
+%1> Vars = #{<<"DB">> => <<"test">>,<<"NS">> => <<"test">>,
+%1>  <<"SC">> => <<"user">>,
+%1>  <<"email">> => <<"info@surrealdb.com">>,
+%1>  <<"pass">> => <<"123456">>}.
+%%  % #{...}
+%2> surreal:signin(Pid, Vars).
+%%  % {ok, <<"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc"...>>}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec signin(surreal_pid(), Vars :: map()) -> surreal_result:result().
+signin(Pid, Vars) ->
+    Params = [Vars],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"signin">>, Params),
+    surreal_result:get_method_result(Response).
+
+%%-------------------------------------------------------------------------
+%% @doc Signs up a user to a specific authentication scope.
+%%
+%% For more information about `Vars', view
+%% <a href="https://surrealdb.com/docs/integration/websocket/text#signup" target="_blank">SurrealDB documentation</a>
+%% and
+%% <a href="https://surrealdb.com/docs/integration/sdks/nodejs#signup" target="_blank">JavaScript SDK</a>.
+%%
+%% ```
+%1> Vars = #{<<"DB">> => <<"test">>,<<"NS">> => <<"test">>,
+%1>  <<"SC">> => <<"user">>,
+%1>  <<"email">> => <<"info@surrealdb.com">>,
+%1>  <<"pass">> => <<"123456">>}.
+%%  % #{...}
+%2> surreal:signup(Pid, Vars).
+%%  % {ok, <<"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc"...>>}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec signup(surreal_pid(), Vars :: map()) -> surreal_result:result().
+signup(Pid, Vars) ->
+    Params = [Vars],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"signup">>, Params),
+    surreal_result:get_method_result(Response).
+
+%%-------------------------------------------------------------------------
+%% @doc Switches to a specific namespace and database.
 %%
 %% ```
 %1> surreal:use(Pid, "test", "test").
-%%  % {ok, null}
+%%  % {ok,null}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
@@ -115,6 +169,7 @@ use(Pid, Namespace, Database) ->
 %1> Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc...".
 %%  % "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc..."
 %2> surreal:authenticate(Pid, Token).
+%%  % {ok,null}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
@@ -130,7 +185,7 @@ authenticate(Pid, Token) ->
 %%
 %% ```
 %1> surreal:invalidate(Pid).
-%%  % {ok, null}
+%%  % {ok,null}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
@@ -304,11 +359,11 @@ delete(Pid, Thing) ->
     surreal_result:get_method_result(Response).
 
 %%-------------------------------------------------------------------------
-%% @doc Specify a variable for the current socket connection.
+%% @doc Creates a variable that can be used throughout the database session.
 %%
 %% ```
 %1> surreal:set(Pid, "PI", 3.14).
-%%  % {ok, null}
+%%  % {ok,null}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
@@ -320,11 +375,11 @@ set(Pid, Variable, Value) ->
     surreal_result:get_method_result(Response).
 
 %%-------------------------------------------------------------------------
-%% @doc Remove a variable from the current socket connection.
+%% @doc Removes a variable from the current socket connection.
 %%
 %% ```
 %1> surreal:unset(Pid, "PI").
-%%  % {ok, null}
+%%  % {ok,null}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
