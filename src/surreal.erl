@@ -7,6 +7,7 @@
 -module(surreal).
 
 -export([
+    child_spec/1,
     start_link/2,
     start_link/3,
     signin/3,
@@ -75,8 +76,16 @@
 %%%
 %%%==========================================================================
 
+-spec child_spec({Url, ConnName, Opts}) -> supervisor:child_spec() when
+    Url :: string(), ConnName :: atom(), Opts :: surreal_opts().
+child_spec({Url, ConnName, Opts}) ->
+    #{
+        id => ConnName,
+        start => {?MODULE, start_link, [Url, ConnName, Opts]}
+    }.
+
 %%-------------------------------------------------------------------------
-%% @doc Connects to a local or remote database endpoint with extra options. Pretty much same with {@link surreal:start_link/2. start_link/2} with an extra argument.
+%% @doc Connects to a local or remote database endpoint with extra options. Pretty much same with {@link surreal:start_link/2} with an extra argument.
 %%
 %% - `Opts' allows you to provide custom options.
 %%
@@ -128,7 +137,7 @@ start_link(Url, ConnName, Opts) ->
 %%-------------------------------------------------------------------------
 %% @doc Connects to a local or remote database endpoint.
 %%
-%% - `Url' must be a valid SurrealDB URI. Visit {@link surreal_config. surreal_config module} for more information.
+%% - `Url' must be a valid SurrealDB URI. Visit {@link surreal_config} for more information.
 %%
 %% - `ConnName' allows you to set a name for connection so you can use given name instead of pid while using SurrealDB.
 %%

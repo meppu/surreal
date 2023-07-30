@@ -2,7 +2,7 @@
 %%% @copyright (C) 2023, meppu
 %%% @doc Erlang-y JSON patch.
 %%%
-%%% Note that this module doesn't implement JSON patch itself but types and converter to make {@link surreal:patch/3. patch/3} easier.
+%%% Note that this module doesn't implement JSON patch itself but types and converter to make {@link surreal:patch/3} easier.
 %%%
 %%% You can learn more about JSON Patch <a href="https://jsonpatch.com/" target="_blank">here</a>.
 %%%
