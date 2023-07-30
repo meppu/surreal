@@ -19,7 +19,9 @@
     update/3,
     merge/3,
     patch/3,
-    delete/2
+    delete/2,
+    set/3,
+    unset/2
 ]).
 
 %%%==========================================================================
@@ -299,4 +301,36 @@ delete(Pid, Thing) ->
     Params = [unicode:characters_to_binary(Thing)],
 
     {ok, Response} = surreal_connection:send_message(Pid, <<"delete">>, Params),
+    surreal_result:get_method_result(Response).
+
+%%-------------------------------------------------------------------------
+%% @doc Specify a variable for the current socket connection.
+%%
+%% ```
+%1> surreal:set(Pid, "PI", 3.14).
+%%  % {ok, null}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec set(surreal_pid(), Variable :: string(), Value :: term()) -> surreal_result:result().
+set(Pid, Variable, Value) ->
+    Params = [unicode:characters_to_binary(Variable), Value],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"let">>, Params),
+    surreal_result:get_method_result(Response).
+
+%%-------------------------------------------------------------------------
+%% @doc Remove a variable from the current socket connection.
+%%
+%% ```
+%1> surreal:unset(Pid, "PI").
+%%  % {ok, null}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec unset(surreal_pid(), Variable :: string()) -> surreal_result:result().
+unset(Pid, Variable) ->
+    Params = [unicode:characters_to_binary(Variable)],
+
+    {ok, Response} = surreal_connection:send_message(Pid, <<"unset">>, Params),
     surreal_result:get_method_result(Response).
