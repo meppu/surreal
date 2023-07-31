@@ -29,26 +29,26 @@
     | patch_test().
 %% Combination of all patch types.
 
--type patch_add() :: {add, Path :: string(), Value :: term()}.
+-type patch_add() :: {add, Path :: iodata(), Value :: term()}.
 %% Adds a value to an object or inserts it into an array.
 %% In the case of an array, the value is inserted before the given index.
 %% The `-' character can be used instead of an index to insert at the end of an array.
 
--type patch_remove() :: {remove, Path :: string()}.
+-type patch_remove() :: {remove, Path :: iodata()}.
 %% Removes a value from an object or array.
 
--type patch_replace() :: {replace, Path :: string(), Value :: term()}.
+-type patch_replace() :: {replace, Path :: iodata(), Value :: term()}.
 %% Replaces a value. Equivalent to a "remove" followed by an "add".
 
--type patch_copy() :: {copy, From :: string(), Path :: string()}.
+-type patch_copy() :: {copy, From :: iodata(), Path :: iodata()}.
 %% Copies a value from one location to another within the JSON document.
 %% Both `From' and `Path' are JSON Pointers.
 
--type patch_move() :: {move, From :: string(), Path :: string()}.
+-type patch_move() :: {move, From :: iodata(), Path :: iodata()}.
 %% Moves a value from one location to the other.
 %% Both `From' and `Path' are JSON Pointers.
 
--type patch_test() :: {test, Path :: string(), Value :: term()}.
+-type patch_test() :: {test, Path :: iodata(), Value :: term()}.
 %% Tests that the specified value is set in the document.
 %% If the test fails, then the patch as a whole should not apply.
 

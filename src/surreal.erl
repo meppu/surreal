@@ -77,7 +77,7 @@
 %%%==========================================================================
 
 -spec child_spec({Url, ConnName, Opts}) -> supervisor:child_spec() when
-    Url :: string(), ConnName :: atom(), Opts :: surreal_opts().
+    Url :: nonempty_string(), ConnName :: atom(), Opts :: surreal_opts().
 child_spec({Url, ConnName, Opts}) ->
     #{
         id => ConnName,
@@ -98,7 +98,7 @@ child_spec({Url, ConnName, Opts}) ->
 %% @end
 %%-------------------------------------------------------------------------
 -spec start_link(Url, ConnName, Opts) -> gen_server:start_ret() when
-    Url :: string(), ConnName :: atom(), Opts :: surreal_opts().
+    Url :: nonempty_string(), ConnName :: atom(), Opts :: surreal_opts().
 start_link(Url, ConnName, Opts) ->
     {ok,
         Config = #{
@@ -117,14 +117,14 @@ start_link(Url, ConnName, Opts) ->
                     false ->
                         {ok, null};
                     Vars when is_map(Vars) ->
-                        signin(Pid, Vars)
+                        {ok, Token} = signin(Pid, Vars),
+                        authenticate(Pid, Token)
                 end,
 
             {ok, _} =
                 case maps:get(use, Opts, true) of
                     true ->
-                        {ok, Token} = use(Pid, Namespace, Database),
-                        authenticate(Pid, Token);
+                        use(Pid, Namespace, Database);
                     false ->
                         {ok, null}
                 end,
@@ -149,7 +149,7 @@ start_link(Url, ConnName, Opts) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec start_link(Url :: string(), ConnName :: atom()) -> gen_server:start_ret().
+-spec start_link(Url :: nonempty_string(), ConnName :: atom()) -> gen_server:start_ret().
 start_link(Url, ConnName) ->
     start_link(Url, ConnName, #{}).
 
@@ -162,7 +162,7 @@ start_link(Url, ConnName) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec signin(surreal_pid(), Username :: string(), Password :: string()) -> surreal_result:result().
+-spec signin(surreal_pid(), Username :: iodata(), Password :: iodata()) -> surreal_result:result().
 signin(Pid, Username, Password) ->
     Params = [
         #{
@@ -235,7 +235,7 @@ signup(Pid, Vars) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec use(surreal_pid(), Namespace :: string(), Database :: string()) -> surreal_result:result().
+-spec use(surreal_pid(), Namespace :: iodata(), Database :: iodata()) -> surreal_result:result().
 use(Pid, Namespace, Database) ->
     Params = [unicode:characters_to_binary(Namespace), unicode:characters_to_binary(Database)],
 
@@ -253,7 +253,7 @@ use(Pid, Namespace, Database) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec authenticate(surreal_pid(), Token :: string()) -> surreal_result:result().
+-spec authenticate(surreal_pid(), Token :: iodata()) -> surreal_result:result().
 authenticate(Pid, Token) ->
     Params = [unicode:characters_to_binary(Token)],
 
@@ -284,7 +284,7 @@ invalidate(Pid) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec query(surreal_pid(), Query :: string(), Variables :: map()) -> surreal_result:result().
+-spec query(surreal_pid(), Query :: iodata(), Variables :: map()) -> surreal_result:result().
 query(Pid, Query, Variables) ->
     Params = [unicode:characters_to_binary(Query), Variables],
 
@@ -307,7 +307,7 @@ query(Pid, Query, Variables) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec select(surreal_pid(), Thing :: string()) -> surreal_result:result().
+-spec select(surreal_pid(), Thing :: iodata()) -> surreal_result:result().
 select(Pid, Thing) ->
     Params = [unicode:characters_to_binary(Thing)],
 
@@ -326,7 +326,7 @@ select(Pid, Thing) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec create(surreal_pid(), Thing :: string(), Data :: map() | null) -> surreal_result:result().
+-spec create(surreal_pid(), Thing :: iodata(), Data :: map() | null) -> surreal_result:result().
 create(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
 
@@ -349,7 +349,7 @@ create(Pid, Thing, Data) ->
 %% @end
 %%-------------------------------------------------------------------------
 -spec insert(surreal_pid(), Thing, Data) -> surreal_result:result() when
-    Thing :: string(),
+    Thing :: iodata(),
     Data :: map() | list(map()).
 insert(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
@@ -370,7 +370,7 @@ insert(Pid, Thing, Data) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec update(surreal_pid(), Thing :: string(), NewData :: map() | null) -> surreal_result:result().
+-spec update(surreal_pid(), Thing :: iodata(), NewData :: map() | null) -> surreal_result:result().
 update(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
 
@@ -390,7 +390,7 @@ update(Pid, Thing, Data) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec merge(surreal_pid(), Thing :: string(), Data :: map() | null) -> surreal_result:result().
+-spec merge(surreal_pid(), Thing :: iodata(), Data :: map() | null) -> surreal_result:result().
 merge(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
 
@@ -413,7 +413,7 @@ merge(Pid, Thing, Data) ->
 %% @end
 %%-------------------------------------------------------------------------
 -spec patch(surreal_pid(), Thing, JSONPatch) -> surreal_result:result() when
-    Thing :: string(),
+    Thing :: iodata(),
     JSONPatch :: list(surreal_patch:patch()) | null.
 patch(Pid, Thing, JSONPatch) ->
     Params = [unicode:characters_to_binary(Thing), surreal_patch:convert(JSONPatch)],
@@ -431,7 +431,7 @@ patch(Pid, Thing, JSONPatch) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec delete(surreal_pid(), Thing :: string()) -> surreal_result:result().
+-spec delete(surreal_pid(), Thing :: iodata()) -> surreal_result:result().
 delete(Pid, Thing) ->
     Params = [unicode:characters_to_binary(Thing)],
 
@@ -447,7 +447,7 @@ delete(Pid, Thing) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec set(surreal_pid(), Variable :: string(), Value :: term()) -> surreal_result:result().
+-spec set(surreal_pid(), Variable :: iodata(), Value :: term()) -> surreal_result:result().
 set(Pid, Variable, Value) ->
     Params = [unicode:characters_to_binary(Variable), Value],
 
@@ -463,7 +463,7 @@ set(Pid, Variable, Value) ->
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec unset(surreal_pid(), Variable :: string()) -> surreal_result:result().
+-spec unset(surreal_pid(), Variable :: iodata()) -> surreal_result:result().
 unset(Pid, Variable) ->
     Params = [unicode:characters_to_binary(Variable)],
 

@@ -15,8 +15,8 @@
 %%%
 %%%==========================================================================
 
--type server_error() :: {error, Code :: integer(), Message :: binary()}.
--type query_error() :: {error, atom() | binary()}.
+-type server_error() :: {error, Code :: integer(), Message :: iodata()}.
+-type query_error() :: {error, atom() | iodata()}.
 -type ok() :: {ok, term()}.
 
 -type inner_result() :: server_error() | query_error() | ok().

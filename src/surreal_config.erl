@@ -82,7 +82,7 @@
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec parse(Uri :: iodata()) -> {ok, connection_map()} | {error, atom(), term()}.
+-spec parse(Uri :: nonempty_string()) -> {ok, connection_map()} | {error, atom(), term()}.
 parse(Uri) ->
     case uri_string:parse(Uri) of
         #{
@@ -137,5 +137,5 @@ parse_scheme("surrealdb") ->
     {ok, false};
 parse_scheme("surrealdb+tls") ->
     {ok, true};
-parse_scheme(_) ->
+parse_scheme(_Other) ->
     {error, invalid_scheme}.
