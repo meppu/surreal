@@ -185,9 +185,7 @@ signin(Pid, Username, Password) ->
             <<"pass">> => unicode:characters_to_binary(Password)
         }
     ],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"signin">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"signin">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Signs in to a root, namespace, database or scope user.
@@ -211,9 +209,7 @@ signin(Pid, Username, Password) ->
 -spec signin(surreal_pid(), Vars :: map()) -> surreal_result:result().
 signin(Pid, Vars) ->
     Params = [Vars],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"signin">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"signin">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Signs up a user to a specific authentication scope.
@@ -237,9 +233,7 @@ signin(Pid, Vars) ->
 -spec signup(surreal_pid(), Vars :: map()) -> surreal_result:result().
 signup(Pid, Vars) ->
     Params = [Vars],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"signup">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"signup">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Switches to a specific namespace and database.
@@ -253,9 +247,7 @@ signup(Pid, Vars) ->
 -spec use(surreal_pid(), Namespace :: iodata(), Database :: iodata()) -> surreal_result:result().
 use(Pid, Namespace, Database) ->
     Params = [unicode:characters_to_binary(Namespace), unicode:characters_to_binary(Database)],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"use">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"use">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Authenticates the current connection with a JWT token.
@@ -271,9 +263,7 @@ use(Pid, Namespace, Database) ->
 -spec authenticate(surreal_pid(), Token :: iodata()) -> surreal_result:result().
 authenticate(Pid, Token) ->
     Params = [unicode:characters_to_binary(Token)],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"authenticate">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"authenticate">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Invalidates the authentication for the current connection.
@@ -286,8 +276,7 @@ authenticate(Pid, Token) ->
 %%-------------------------------------------------------------------------
 -spec invalidate(surreal_pid()) -> surreal_result:result().
 invalidate(Pid) ->
-    {ok, Response} = surreal_connection:send_message(Pid, <<"invalidate">>, null),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"invalidate">>, null).
 
 %%-------------------------------------------------------------------------
 %% @doc Runs a set of SurrealQL statements against the database.
@@ -302,10 +291,7 @@ invalidate(Pid) ->
 -spec query(surreal_pid(), Query :: iodata(), Variables :: map()) -> surreal_result:result().
 query(Pid, Query, Variables) ->
     Params = [unicode:characters_to_binary(Query), Variables],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"query">>, Params),
-    {ok, Result} = surreal_result:get_method_result(Response),
-    surreal_result:get_query_result(Result).
+    send_handle_query_message(Pid, <<"query">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Selects all records in a table, or a specific record.
@@ -325,9 +311,7 @@ query(Pid, Query, Variables) ->
 -spec select(surreal_pid(), Thing :: iodata()) -> surreal_result:result().
 select(Pid, Thing) ->
     Params = [unicode:characters_to_binary(Thing)],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"select">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"select">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Creates a record in the database.
@@ -344,9 +328,7 @@ select(Pid, Thing) ->
 -spec create(surreal_pid(), Thing :: iodata(), Data :: map() | null) -> surreal_result:result().
 create(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"create">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"create">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @since 2.0.0
@@ -368,9 +350,7 @@ create(Pid, Thing, Data) ->
     Data :: map() | list(map()).
 insert(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"insert">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"insert">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Updates all records in a table, or a specific record, in the database.
@@ -388,9 +368,7 @@ insert(Pid, Thing, Data) ->
 -spec update(surreal_pid(), Thing :: iodata(), NewData :: map() | null) -> surreal_result:result().
 update(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"update">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"update">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Modifies all records in a table, or a specific record, in the database.
@@ -408,9 +386,7 @@ update(Pid, Thing, Data) ->
 -spec merge(surreal_pid(), Thing :: iodata(), Data :: map() | null) -> surreal_result:result().
 merge(Pid, Thing, Data) ->
     Params = [unicode:characters_to_binary(Thing), Data],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"merge">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"merge">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Applies JSON Patch changes to all records, or a specific record, in the database.
@@ -432,9 +408,7 @@ merge(Pid, Thing, Data) ->
     JSONPatch :: list(surreal_patch:patch()) | null.
 patch(Pid, Thing, JSONPatch) ->
     Params = [unicode:characters_to_binary(Thing), surreal_patch:convert(JSONPatch)],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"patch">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"patch">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Deletes all records in a table, or a specific record, from the database.
@@ -449,9 +423,7 @@ patch(Pid, Thing, JSONPatch) ->
 -spec delete(surreal_pid(), Thing :: iodata()) -> surreal_result:result().
 delete(Pid, Thing) ->
     Params = [unicode:characters_to_binary(Thing)],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"delete">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"delete">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Creates a variable that can be used throughout the database session.
@@ -465,9 +437,7 @@ delete(Pid, Thing) ->
 -spec set(surreal_pid(), Variable :: iodata(), Value :: term()) -> surreal_result:result().
 set(Pid, Variable, Value) ->
     Params = [unicode:characters_to_binary(Variable), Value],
-
-    {ok, Response} = surreal_connection:send_message(Pid, <<"let">>, Params),
-    surreal_result:get_method_result(Response).
+    send_handle_message(Pid, <<"let">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Removes a variable from the current socket connection.
@@ -481,6 +451,28 @@ set(Pid, Variable, Value) ->
 -spec unset(surreal_pid(), Variable :: iodata()) -> surreal_result:result().
 unset(Pid, Variable) ->
     Params = [unicode:characters_to_binary(Variable)],
+    send_handle_message(Pid, <<"unset">>, Params).
 
-    {ok, Response} = surreal_connection:send_message(Pid, <<"unset">>, Params),
-    surreal_result:get_method_result(Response).
+%%%==========================================================================
+%%%
+%%%   Private functions
+%%%
+%%%==========================================================================
+
+%% @private
+send_handle_message(Pid, Method, Params) ->
+    case surreal_connection:send_message(Pid, Method, Params) of
+        {ok, Response} ->
+            surreal_result:get_method_result(Response);
+        Other ->
+            Other
+    end.
+
+%% @private
+send_handle_query_message(Pid, Method, Params) ->
+    case send_handle_message(Pid, Method, Params) of
+        {ok, Response} ->
+            surreal_result:get_query_result(Response);
+        Other ->
+            Other
+    end.
