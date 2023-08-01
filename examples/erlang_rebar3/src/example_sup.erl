@@ -1,8 +1,3 @@
-%%%-------------------------------------------------------------------
-%% @doc with_rebar3 top level supervisor.
-%% @end
-%%%-------------------------------------------------------------------
-
 -module(example_sup).
 -behaviour(supervisor).
 
@@ -15,6 +10,8 @@ start_link() ->
 
 init([]) ->
     SupFlags = #{strategy => one_for_one},
-    ChildSpecs = [surreal:child_spec({"surrealdb://root:root@localhost:8000/test/test", db_conn, #{}})],
+    ChildSpecs = [
+        surreal:child_spec({"surrealdb://root:root@localhost:8000/test/test", db_conn, #{}})
+    ],
     
     {ok, {SupFlags, ChildSpecs}}.

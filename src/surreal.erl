@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------------
 %%% @copyright (C) 2023, meppu
-%%% @doc Erlang driver for SurrealDB.
+%%% @doc SurrealDB driver for BEAM ecosystem.
 %%% @author meppu
 %%% @end
 %%%-------------------------------------------------------------------------
@@ -77,6 +77,10 @@
 %%%
 %%%==========================================================================
 
+%%-------------------------------------------------------------------------
+%% @doc Child specification for SurrealDB Erlang.
+%% @end
+%%-------------------------------------------------------------------------
 -spec child_spec({Url, ConnName, Opts}) -> supervisor:child_spec() when
     Url :: nonempty_string(), ConnName :: atom(), Opts :: surreal_opts().
 child_spec({Url, ConnName, Opts}) ->
