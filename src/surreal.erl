@@ -10,6 +10,7 @@
     child_spec/1,
     start_link/2,
     start_link/3,
+    close/1,
     signin/3,
     signin/2,
     signup/2,
@@ -81,7 +82,8 @@
 child_spec({Url, ConnName, Opts}) ->
     #{
         id => ConnName,
-        start => {?MODULE, start_link, [Url, ConnName, Opts]}
+        start => {?MODULE, start_link, [Url, ConnName, Opts]},
+        restart => transient
     }.
 
 %%-------------------------------------------------------------------------
@@ -152,6 +154,19 @@ start_link(Url, ConnName, Opts) ->
 -spec start_link(Url :: nonempty_string(), ConnName :: atom()) -> gen_server:start_ret().
 start_link(Url, ConnName) ->
     start_link(Url, ConnName, #{}).
+
+%%-------------------------------------------------------------------------
+%% @doc Closes the persistent connection to the database.
+%%
+%% ```
+%1> surreal:close(Pid).
+%%  % ok
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec close(surreal_pid()) -> ok.
+close(Pid) ->
+    surreal_connection:close(Pid).
 
 %%-------------------------------------------------------------------------
 %% @doc Signs in to the database with username and password.
