@@ -1,6 +1,6 @@
-# Elixir Example Mix Project
+# Example Elixir Mix Project
 
-This example mix project demonstrates the usage of the SurrealDB erlang library in Elixir.
+This example Mix project demonstrates the usage of the SurrealDB erlang library in Elixir.
 
 ## Setup
 
@@ -11,7 +11,6 @@ This example mix project demonstrates the usage of the SurrealDB erlang library 
 2. Start SurrealDB server:
 
    ```bash
-   # An example!
    surrealdb start --user root --pass root memory --log debug
    ```
 
@@ -23,7 +22,7 @@ This example mix project demonstrates the usage of the SurrealDB erlang library 
 
    ```bash
    git clone https://github.com/meppu/surreal.git
-   cd ./surreal/examples/elixir_usage
+   cd ./surreal/examples/elixir_mix
    ```
 
 3. Fetch and compile the dependencies:
@@ -37,8 +36,6 @@ This example mix project demonstrates the usage of the SurrealDB erlang library 
 
 ## Running the Example
 
-Make sure to change the SurrealDB URL in `application.ex` for your own one.
-
 To run the example, start an interactive Elixir shell (iex):
 
 **NOTE**: You may need to change `iex` to `iex.bat` on Windows!
@@ -47,25 +44,25 @@ To run the example, start an interactive Elixir shell (iex):
 iex -S mix
 ```
 
-Now you can play with `ElixirUsage.Users` module:
+Now you can play with `Example.Users` module:
 
 ```elixir
-iex(1)> ElixirUsage.Users.add("meppu", 16)
+iex(1)> Example.Users.add("meppu", 16)
 {:ok, %{"age" => 16, "id" => "users:meppu", "verified" => false}}
-iex(2)> ElixirUsage.Users.get("meppu")
+iex(2)> Example.Users.get("meppu")
 {:ok, %{"age" => 16, "id" => "users:meppu", "verified" => false}}
-iex(3)> ElixirUsage.Users.verify("meppu")
+iex(3)> Example.Users.verify("meppu")
 {:ok, %{"age" => 16, "id" => "users:meppu", "verified" => true}}
-iex(4)> ElixirUsage.Users.add("tuhana", 18)
+iex(4)> Example.Users.add("tuhana", 18)
 {:ok, %{"age" => 18, "id" => "users:tuhana", "verified" => false}}
-iex(5)> ElixirUsage.Users.get_all()
+iex(5)> Example.Users.get_all()
 {:ok,
  [
    %{"age" => 16, "id" => "users:meppu", "verified" => true},
    %{"age" => 18, "id" => "users:tuhana", "verified" => false}
  ]}
-iex(6)> ElixirUsage.Users.remove("meppu")
+iex(6)> Example.Users.remove("meppu")
 {:ok, %{"age" => 16, "id" => "users:meppu", "verified" => true}}
-iex(7)> ElixirUsage.Users.get_all()
+iex(7)> Example.Users.get_all()
 {:ok, [%{"age" => 18, "id" => "users:tuhana", "verified" => false}]}
 ```

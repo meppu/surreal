@@ -1,7 +1,7 @@
-defmodule ElixirUsage.Users do
+defmodule Example.Users do
   alias :surreal, as: Surreal
 
-  @conn ElixirUsage.Database
+  @conn Example.Database
   @table "users"
 
   def add(name, age) do
