@@ -36,10 +36,17 @@
 %%%
 %%%     The name of the SurrealDB database that you want to use.
 %%%
+%%% === Timeout ===
+%%%
+%%%     Timeout for the operations in milliseconds. Default is `5000' (5 seconds).
+%%%
 %%% == Example URI ==
 %%%
 %%% <strong>Default for SurrealDB</strong>:
 %%% `surrealdb://root:root@localhost:8000/test/test'
+%%%
+%%% <strong>Default for SurrealDB with 10s timeout</strong>:
+%%% `surrealdb://root:root@localhost:8000/test/test?timeout=10000'
 %%%
 %%% @author meppu
 %%% @end
@@ -62,7 +69,8 @@
     namespace => string(),
     database => string(),
     port => non_neg_integer(),
-    tls => boolean()
+    tls => boolean(),
+    timeout => timeout()
 }.
 
 %%%==========================================================================
@@ -77,7 +85,7 @@
 %% ```
 %1> surreal_config:parse("surrealdb://root:root@localhost:8000/test/test").
 %%  % {ok,#{database => "test",host => "localhost",namespace => "test",
-%%  %       password => "root",path => "/test/test",port => 8000,
+%%  %       password => "root",port => 8000,timeout => 5000,
 %%  %       tls => false,username => "root"}}
 %% '''
 %% @end
@@ -91,20 +99,21 @@ parse(Uri) ->
             port := Port,
             scheme := Scheme,
             userinfo := UserInfo
-        } ->
+        } = Parsed ->
             {ok, Tls} = parse_scheme(Scheme),
             {ok, [Username, Password]} = parse_userinfo(UserInfo),
             {ok, [Namespace, Database]} = parse_path(Path),
+            {ok, Timeout} = parse_timeout(maps:get(query, Parsed, "timeout=5000")),
 
             {ok, #{
                 host => Host,
-                path => Path,
                 username => Username,
                 password => Password,
                 namespace => Namespace,
                 database => Database,
                 port => Port,
-                tls => Tls
+                tls => Tls,
+                timeout => Timeout
             }};
         {error, _, _} = Error ->
             Error;
@@ -139,3 +148,13 @@ parse_scheme("surrealdb+tls") ->
     {ok, true};
 parse_scheme(_Other) ->
     {error, invalid_scheme}.
+
+%% @private
+parse_timeout(RawQuery) ->
+    ParsedQuery = uri_string:dissect_query(RawQuery),
+    case lists:keysearch("timeout", 1, ParsedQuery) of
+        {value, {"timeout", Timeout}} ->
+            {ok, list_to_integer(Timeout)};
+        _Other ->
+            {error, invalid_query}
+    end.
