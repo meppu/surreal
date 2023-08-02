@@ -9,7 +9,7 @@
 
 </div>
 
-SurrealDB Erlang, also referred to as the "surreal", is a robust and maintainable SurrealDB driver for BEAM ecosystem.
+SurrealDB Erlang, also referred to as "surreal", is a robust and maintainable SurrealDB driver for BEAM ecosystem.
 
 The library draws inspiration from the official [surrealdb.js](https://github.com/surrealdb/surrealdb.js) implementation.
 
@@ -33,7 +33,7 @@ Check out SurrealDB URI format described in the [documentation](https://hexdocs.
 {ok, Pid} = surreal:start_link("surrealdb://root:root@localhost:8000/test/test", my_connection).
 ```
 
-You can also use the specified connection name, `my_connection`, in place of `Pid`, as shown below:
+Alternatively, you can use the specified connection name, `my_connection`, in place of `Pid`, as shown below:
 
 ```erlang
 {ok, Users} = surreal:select(my_connection, "users").
@@ -61,7 +61,7 @@ SurrealDB Erlang offers users a clean API, demonstrated below:
 
 ### With Supervisor
 
-The recommended approach to initialize a SurrealDB connection is through a supervisor.
+The recommended approach to initialise a SurrealDB connection is through a supervisor.
 
 You can use `surreal:child_spec/1` to create a child specification for your supervisor, as shown below:
 

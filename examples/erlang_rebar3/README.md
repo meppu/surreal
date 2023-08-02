@@ -1,6 +1,6 @@
 # Example Erlang Rebar3 Project
 
-This example Rebar3 project demonstrates the usage of the SurrealDB erlang library in Erlang.
+This exemplary Rebar3 project demonstrates the usage of the SurrealDB Erlang library in Erlang.
 
 ## Setup
 
@@ -8,7 +8,7 @@ This example Rebar3 project demonstrates the usage of the SurrealDB erlang libra
 
 1. Install SurrealDB (if not already installed) by following the official installation instructions: [SurrealDB Installation Guide](https://surrealdb.com/docs/installation).
 
-2. Start SurrealDB server:
+2. Start the SurrealDB server:
 
    ```bash
    surrealdb start --user root --pass root memory --log debug
@@ -16,9 +16,9 @@ This example Rebar3 project demonstrates the usage of the SurrealDB erlang libra
 
 ### Project
 
-1. Install Erlang (if not already installed).
+1. Install Erlang/OTP (if not already installed) by following the installation instructions from [Adopting Erlang](https://adoptingerlang.org): [Erlang/OTP Installation Guide](https://adoptingerlang.org/docs/development/setup/#installing-erlang-otp).
 
-2. Install Rebar3 (if not already installed).
+2. Install Rebar3 (if not already installed) by following the official installation instructions: [Rebar3 Installation Guide](https://www.rebar3.org/docs/getting-started).
 
 3. Clone the repository and navigate to the project directory:
 
@@ -33,17 +33,17 @@ This example Rebar3 project demonstrates the usage of the SurrealDB erlang libra
    rebar3 compile
    ```
 
-5. Make sure to update connection URI in `src/example_sup.erl` for your environment.
+5. Ensure to update the connection URI in `src/example_sup.erl` for your environment.
 
 ## Running the Example
 
-To run the example, start a shell:
+To execute the example, start an interactive shell:
 
 ```bash
 rebar3 shell
 ```
 
-Now you can play with `example_users` module:
+Now you can interact with the `example_users` module:
 
 ```erlang
 1> example_users:add("meppu", 16).

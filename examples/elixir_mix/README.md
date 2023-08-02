@@ -1,6 +1,6 @@
 # Example Elixir Mix Project
 
-This example Mix project demonstrates the usage of the SurrealDB erlang library in Elixir.
+This exemplary Mix project demonstrates the usage of the SurrealDB Erlang library in Elixir.
 
 ## Setup
 
@@ -8,7 +8,7 @@ This example Mix project demonstrates the usage of the SurrealDB erlang library 
 
 1. Install SurrealDB (if not already installed) by following the official installation instructions: [SurrealDB Installation Guide](https://surrealdb.com/docs/installation).
 
-2. Start SurrealDB server:
+2. Start the SurrealDB server:
 
    ```bash
    surrealdb start --user root --pass root memory --log debug
@@ -32,19 +32,19 @@ This example Mix project demonstrates the usage of the SurrealDB erlang library 
    mix deps.compile
    ```
 
-4. Make sure to update connection URI in `lib/application.ex` for your environment.
+4. Ensure to update connection URI in `lib/application.ex` for your environment.
 
 ## Running the Example
 
-To run the example, start an interactive Elixir shell (iex):
+To execute the example, start an interactive Elixir shell (iex):
 
-**NOTE**: You may need to change `iex` to `iex.bat` on Windows!
+**NOTE**: You may need to alter `iex` to `iex.bat` on Windows!
 
 ```bash
 iex -S mix
 ```
 
-Now you can play with `Example.Users` module:
+Now you can interact with the `Example.Users` module:
 
 ```elixir
 iex(1)> Example.Users.add("meppu", 16)
