@@ -3,7 +3,7 @@ description: Report anything that is not working as expected
 body:
   - type: markdown
     attributes:
-      value: >
+      value: |
         Your contribution is greatly appreciated! :heart:
 
         Please don't use this form for asking questions or seeking support. Instead, feel free to use GitHub Discussions for any inquiries.

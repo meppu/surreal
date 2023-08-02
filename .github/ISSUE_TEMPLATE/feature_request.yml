@@ -3,7 +3,7 @@ description: Suggest a new feature or enhancement for the project
 body:
   - type: markdown
     attributes:
-      value: >
+      value: |
         Your contribution is greatly appreciated! :heart:
 
         Please use this template to submit your feature request. Describe the new feature or enhancement you would like to see in the project.
