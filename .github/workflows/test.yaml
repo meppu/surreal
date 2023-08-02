@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        otp: ["26", "25", "24"]
+        otp: ["26.0.2", "25.3.2.5"]
       fail-fast: false
 
     steps:
