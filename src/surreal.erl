@@ -49,7 +49,7 @@
 %%
 %% <dl>
 %%   <dt>`true'</dt>
-%%   <dd>This is the default option, and it indicates that the signin process is enabled and should be used with the given URL.</dd>
+%%   <dd>This is the default option, and it indicates that the signin process is enabled and should be used with the given uri.</dd>
 %%
 %%   <dt>`false'</dt>
 %%   <dd>This option stands for disabling the signin process entirely.</dd>
@@ -81,12 +81,12 @@
 %% @doc Child specification for SurrealDB Erlang.
 %% @end
 %%-------------------------------------------------------------------------
--spec child_spec({Url, ConnName, Opts}) -> supervisor:child_spec() when
-    Url :: nonempty_string(), ConnName :: atom(), Opts :: surreal_opts().
-child_spec({Url, ConnName, Opts}) ->
+-spec child_spec({Uri, ConnName, Opts}) -> supervisor:child_spec() when
+    Uri :: nonempty_string(), ConnName :: atom(), Opts :: surreal_opts().
+child_spec({Uri, ConnName, Opts}) ->
     #{
         id => ConnName,
-        start => {?MODULE, start_link, [Url, ConnName, Opts]},
+        start => {?MODULE, start_link, [Uri, ConnName, Opts]},
         restart => transient
     }.
 
@@ -96,23 +96,23 @@ child_spec({Url, ConnName, Opts}) ->
 %% - `Opts' allows you to provide custom options.
 %%
 %% ```
-%1> Url = "surrealdb://root:root@localhost:8000/surrealdb/docs".
+%1> Uri = "surrealdb://root:root@localhost:8000/surrealdb/docs".
 %%  % "surrealdb://root:root@localhost:8000/surrealdb/docs"
-%2> {ok, Pid} = surreal:start_link(Url, database, #{use => false}).
+%2> {ok, Pid} = surreal:start_link(Uri, database, #{use => false}).
 %%  % {ok,<0.359.0>}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec start_link(Url, ConnName, Opts) -> gen_server:start_ret() when
-    Url :: nonempty_string(), ConnName :: atom(), Opts :: surreal_opts().
-start_link(Url, ConnName, Opts) ->
+-spec start_link(Uri, ConnName, Opts) -> gen_server:start_ret() when
+    Uri :: nonempty_string(), ConnName :: atom(), Opts :: surreal_opts().
+start_link(Uri, ConnName, Opts) ->
     {ok,
         Config = #{
             username := Username,
             password := Password,
             namespace := Namespace,
             database := Database
-        }} = surreal_config:parse(Url),
+        }} = surreal_config:parse(Uri),
 
     case surreal_connection:start_link(Config, ConnName) of
         {ok, Pid} ->
@@ -143,21 +143,21 @@ start_link(Url, ConnName, Opts) ->
 %%-------------------------------------------------------------------------
 %% @doc Connects to a local or remote database endpoint.
 %%
-%% - `Url' must be a valid SurrealDB URI. Visit {@link surreal_config} for more information.
+%% - `Uri' must be a valid SurrealDB URI. Visit {@link surreal_config} for more information.
 %%
 %% - `ConnName' allows you to set a name for connection so you can use given name instead of pid while using SurrealDB.
 %%
 %% ```
-%1> Url = "surrealdb://root:root@localhost:8000/surrealdb/docs".
+%1> Uri = "surrealdb://root:root@localhost:8000/surrealdb/docs".
 %%  % "surrealdb://root:root@localhost:8000/surrealdb/docs"
-%2> {ok, Pid} = surreal:start_link(Url, database).
+%2> {ok, Pid} = surreal:start_link(Uri, database).
 %%  % {ok,<0.359.0>}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec start_link(Url :: nonempty_string(), ConnName :: atom()) -> gen_server:start_ret().
-start_link(Url, ConnName) ->
-    start_link(Url, ConnName, #{}).
+-spec start_link(Uri :: nonempty_string(), ConnName :: atom()) -> gen_server:start_ret().
+start_link(Uri, ConnName) ->
+    start_link(Uri, ConnName, #{}).
 
 %%-------------------------------------------------------------------------
 %% @doc Closes the persistent connection to the database.

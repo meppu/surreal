@@ -33,7 +33,7 @@ This example Rebar3 project demonstrates the usage of the SurrealDB erlang libra
    rebar3 compile
    ```
 
-5. Make sure to update connection URL in `src/example_sup.ex` for your environment.
+5. Make sure to update connection URI in `src/example_sup.erl` for your environment.
 
 ## Running the Example
 

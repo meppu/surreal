@@ -32,7 +32,7 @@ This example Mix project demonstrates the usage of the SurrealDB erlang library 
    mix deps.compile
    ```
 
-4. Make sure to update connection URL in `lib/application.ex` for your environment.
+4. Make sure to update connection URI in `lib/application.ex` for your environment.
 
 ## Running the Example
 
