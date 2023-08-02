@@ -35,7 +35,7 @@ start_link(Config, ConnName) ->
 -spec send_message(Pid, Method, Params) -> surreal_result:result() when
     Pid :: gen_server:server_ref(),
     Method :: binary(),
-    Params :: list(term()).
+    Params :: list(term()) | null.
 send_message(Pid, Method, Params) ->
     #{timeout := Timeout} = gen_server:call(Pid, get_opts),
 
@@ -55,7 +55,7 @@ send_message(Pid, Method, Params) ->
 
 -spec send_and_wait(Pid, Payload) -> term() when
     Pid :: gen_server:server_ref(),
-    Payload :: map().
+    Payload :: list(term()) | null.
 send_and_wait(Pid, Payload) ->
     gen_server:cast(Pid, {send, Payload, self()}),
 
@@ -129,7 +129,7 @@ handle_info({gun_ws, ConnPid, StreamRef, {text, Packet}}, {_ConnPid, _StreamRef,
         [{PacketId, Pid} | _Other] ->
             ets:delete(Table, PacketId),
             Pid ! PacketDecoded;
-        _ ->
+        _Other ->
             noop
     end,
 

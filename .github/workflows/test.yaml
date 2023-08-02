@@ -36,6 +36,12 @@ jobs:
       - name: Check Format
         run: rebar3 fmt --check
 
+      - name: Run Dialyzer
+        run: rebar3 dialyzer
+
+      - name: Run XRef
+        run: rebar3 xref
+
       - name: Set up SurrealDB
         run: |
           docker run -it -d --rm --name surrealdb -p 8000:8000 \

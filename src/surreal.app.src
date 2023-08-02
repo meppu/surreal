@@ -5,7 +5,8 @@
     {applications, [
         kernel,
         stdlib,
-        gun
+        gun,
+        jsx
     ]},
     {env, []},
     {modules, []},
