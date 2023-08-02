@@ -45,3 +45,5 @@ body:
     attributes:
       label: Accept Contributions
       description: Can you contribute to the development of this feature?
+      options:
+        - label: I can contribute to the development of this feature.

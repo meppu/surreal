@@ -44,17 +44,17 @@ body:
       required: true
 
   - type: textarea
-    id: current-behavior
+    id: current-behaviour
     attributes:
-      label: Current Behavior
+      label: Current Behaviour
       description: Include code samples, errors, and stacktraces if appropriate.
     validations:
       required: true
 
   - type: textarea
-    id: expected-behavior
+    id: expected-behaviour
     attributes:
-      label: Expected Behavior
+      label: Expected Behaviour
       description: A short description on how you expect the code to behave.
     validations:
       required: true
