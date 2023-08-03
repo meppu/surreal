@@ -1,0 +1,49 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for the project
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Your contribution is greatly appreciated! :heart:
+
+        Please use this template to submit your feature request. Describe the new feature or enhancement you would like to see in the project.
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Provide a concise summary of your feature request.
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a detailed description of the feature or enhancement you are suggesting.
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Explain how this feature will be beneficial or what problems it will solve.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional Information
+      description: Add any additional information, examples, or related resources if applicable.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: accept-contributions
+    attributes:
+      label: Accept Contributions
+      description: Can you contribute to the development of this feature?
+      options:
+        - label: I can contribute to the development of this feature.

@@ -1,102 +1,165 @@
-%%% @doc Module for advanced configs.
+%%%-------------------------------------------------------------------------
+%%% @copyright (C) 2023, meppu
+%%% @doc Connection configuration module for SurrealDB Erlang.
 %%%
-%%% This module allows you to set configs and use them with calling one function.
+%%% == SurrealDB URI Format ==
+%%%
+%%% The SurrealDB URI format is an unofficial way to represent connection information for accessing SurrealDB.
+%%% It allows users to define various parameters necessary for establishing a connection to the database server.
+%%%
+%%% This format has been adopted and enhanced from
+%%% <a href="https://github.com/ri-nat/mylk#database-connection-string-format" target="_blank">mylk</a>,
+%%% a SurrealDB driver for Ruby.
+%%%
+%%% The URI format follows this format:
+%%%
+%%% - <strong>Plain TCP</strong>:
+%%%   `surrealdb://username:password@host:port/namespace/database'
+%%%
+%%% - <strong>TLS</strong>:
+%%%   `surrealdb+tls://username:password@host:port/namespace/database'
+%%%
+%%% === Scheme ===
+%%%
+%%%     This is the scheme used to identify SurrealDB connections. The optional "tls" part
+%%%     indicates that the connection should be made over TLS (Transport Layer Security),
+%%%     providing a secure and encrypted communication channel.
+%%%
+%%% === Credentials ===
+%%%
+%%%     The username and password to authenticate with the SurrealDB server.
+%%%
+%%% === Host ===
+%%%
+%%%     The hostname or IP address of the SurrealDB server.
+%%%
+%%% === Namespace ===
+%%%
+%%%     The name of the SurrealDB namespace that you want to use.
+%%%
+%%% === Database ===
+%%%
+%%%     The name of the SurrealDB database that you want to use.
+%%%
+%%% === Timeout ===
+%%%
+%%%     Timeout for the operations in milliseconds. Default is `5000' (5 seconds).
+%%%
+%%% == Example URI ==
+%%%
+%%% <strong>Default for SurrealDB</strong>:
+%%% `surrealdb://root:root@localhost:8000/test/test'
+%%%
+%%% <strong>Default for SurrealDB with 10s timeout</strong>:
+%%% `surrealdb://root:root@localhost:8000/test/test?timeout=10000'
+%%%
+%%% @author meppu
+%%% @end
+%%%-------------------------------------------------------------------------
 -module(surreal_config).
 
--type config_value() ::
-    secure
-    | link
-    | {name, atom()}
-    | {host, string()}
-    | {port, integer()}
-    | {signin, {string(), string()}}
-    | {use, {string(), string()}}.
+-export([parse/1]).
+-export_type([connection_map/0]).
 
--type config() :: list(config_value()).
+%%%==========================================================================
+%%%
+%%%   Public types
+%%%
+%%%==========================================================================
 
--export([child_spec/1, load/1]).
+-type connection_map() :: #{
+    host => string(),
+    username => string(),
+    password => string(),
+    namespace => string(),
+    database => string(),
+    port => non_neg_integer(),
+    tls => boolean(),
+    timeout => timeout()
+}.
 
-%% @doc Child specifications for Surreal connection.
--spec child_spec(Config :: config()) -> supervisor:child_spec().
-child_spec(Config) ->
-    case proplists:get_value(name, Config) of
-        undefined ->
-            erlang:error("Please provide a name for child specification");
-        Name ->
-            #{
-                id => Name,
-                start => {surreal_config, load, [Config]}
-            }
+%%%==========================================================================
+%%%
+%%%   Public functions
+%%%
+%%%==========================================================================
+
+%%-------------------------------------------------------------------------
+%% @doc Parse SurrealDB URI.
+%%
+%% ```
+%1> surreal_config:parse("surrealdb://root:root@localhost:8000/test/test").
+%%  % {ok,#{database => "test",host => "localhost",namespace => "test",
+%%  %       password => "root",port => 8000,timeout => 5000,
+%%  %       tls => false,username => "root"}}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec parse(Uri :: nonempty_string()) -> {ok, connection_map()} | {error, atom(), term()}.
+parse(Uri) ->
+    case uri_string:parse(Uri) of
+        #{
+            host := Host,
+            path := Path,
+            port := Port,
+            scheme := Scheme,
+            userinfo := UserInfo
+        } = Parsed ->
+            {ok, Tls} = parse_scheme(Scheme),
+            {ok, [Username, Password]} = parse_userinfo(UserInfo),
+            {ok, [Namespace, Database]} = parse_path(Path),
+            {ok, Timeout} = parse_timeout(maps:get(query, Parsed, "timeout=5000")),
+
+            {ok, #{
+                host => Host,
+                username => Username,
+                password => Password,
+                namespace => Namespace,
+                database => Database,
+                port => Port,
+                tls => Tls,
+                timeout => Timeout
+            }};
+        {error, _, _} = Error ->
+            Error;
+        _ ->
+            {error, invalid_uri, []}
     end.
 
-%% @doc Start client from config.
--spec load(Config :: config()) ->
-    {ok, pid()}.
-load(Config) ->
-    case load_piece({start, Config}) of
-        {ok, Pid} ->
-            load_piece({signin, Pid, Config}),
-            load_piece({use, Pid, Config}),
-
-            {ok, Pid};
-        Other ->
-            Other
-    end.
-
-%%% -------------------------------------------
-%%% Following functions are for internal usage.
-%%% -------------------------------------------
+%%%==========================================================================
+%%%
+%%%   Private functions
+%%%
+%%%==========================================================================
 
 %% @private
-load_piece({protocol, Config}) ->
-    case proplists:is_defined(secure, Config) of
-        true ->
-            "wss";
-        false ->
-            "ws"
-    end;
-load_piece({url, Config}) ->
-    WebSocketProtocol = load_piece({protocol, Config}),
-    WebSocketHost = proplists:get_value(host, Config),
-    WebSocketUrl =
-        case proplists:get_value(port, Config) of
-            undefined ->
-                io_lib:format("~s://~s", [WebSocketProtocol, WebSocketHost]);
-            Port ->
-                io_lib:format("~s://~s:~b", [WebSocketProtocol, WebSocketHost, Port])
-        end,
+parse_userinfo(UserInfo) ->
+    case string:split(UserInfo, ":", all) of
+        [_, _] = Data -> {ok, Data};
+        _ -> {error, invalid_userinfo}
+    end.
 
-    lists:flatten(WebSocketUrl);
-load_piece({start, Config}) ->
-    WebSocketUrl = load_piece({url, Config}),
+%% @private
+parse_path(Path) ->
+    case string:split(Path, "/", all) of
+        [[], Namespace, Database] -> {ok, [Namespace, Database]};
+        _ -> {error, invalid_path}
+    end.
 
-    case proplists:is_defined(link, Config) of
-        true ->
-            case proplists:get_value(name, Config) of
-                undefined ->
-                    gen_server:start_link(surreal_gen_server, [WebSocketUrl], []);
-                Name ->
-                    gen_server:start_link({local, Name}, surreal_gen_server, [WebSocketUrl], [])
-            end;
-        false ->
-            case proplists:get_value(name, Config) of
-                undefined ->
-                    gen_server:start(surreal_gen_server, [WebSocketUrl], []);
-                Name ->
-                    gen_server:start({local, Name}, surreal_gen_server, [WebSocketUrl], [])
-            end
-    end;
-load_piece({signin, Pid, Config}) ->
-    case proplists:get_value(signin, Config) of
-        {User, Pass} ->
-            surreal:signin(Pid, User, Pass);
-        _ ->
-            noop
-    end;
-load_piece({use, Pid, Config}) ->
-    case proplists:get_value(use, Config) of
-        {Namespace, Database} ->
-            surreal:use(Pid, Namespace, Database);
-        _ ->
-            noop
+%% @private
+parse_scheme("surrealdb") ->
+    {ok, false};
+parse_scheme("surrealdb+tls") ->
+    {ok, true};
+parse_scheme(_Other) ->
+    {error, invalid_scheme}.
+
+%% @private
+parse_timeout(RawQuery) ->
+    ParsedQuery = uri_string:dissect_query(RawQuery),
+    case lists:keysearch("timeout", 1, ParsedQuery) of
+        {value, {"timeout", Timeout}} ->
+            {ok, list_to_integer(Timeout)};
+        _Other ->
+            {error, invalid_query}
     end.

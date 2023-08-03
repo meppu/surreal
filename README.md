@@ -1,79 +1,124 @@
 <div align="center">
 
-![banner](.github/assets/banner.webp)
+<img src="https://raw.githubusercontent.com/meppu/surreal/main/.github/assets/banner.webp" alt="banner" />
 
-# SurrealDB Erlang
+<h2>SurrealDB Erlang</h2>
+<p>SurrealDB driver for BEAM ecosystem</p>
 
-Erlang driver for SurrealDB.
+<strong>⚠️ You are currently viewing version 2 ⚠️</strong>
 
 </div>
 
-> ⚠️ You are currently viewing main branch ⚠️
+SurrealDB Erlang, also referred to as "surreal", is a robust and maintainable SurrealDB driver for BEAM ecosystem.
 
-Package name named as [surreal on hex](https://hex.pm/packages/surreal). Because an Erlang implementation can be used in other languages that runs on BEAM virtual machine, such as Elixir and Gleam.
+The library draws inspiration from the official [surrealdb.js](https://github.com/surrealdb/surrealdb.js) implementation.
 
-This library tries to be compatible with the [official implementation.](https://github.com/surrealdb/surrealdb.js)
+## Index
+
+- [Index](#index)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+  - [Creating a Connection](#creating-a-connection)
+  - [Example Usage](#example-usage)
+  - [With Supervisor](#with-supervisor)
+  - [Additional Examples](#additional-examples)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+  - [Note for Contributors](#note-for-contributors)
+- [License](#license)
 
 ## Installation
 
 Add `surreal` to your list of dependencies in `rebar.config` file:
 
 ```erlang
-{deps, [{surreal, "1.1.0"}]}.
+{deps, [{surreal, "2.0.0"}]}.
 ```
 
-## Usage
+## Getting Started
 
-### Simple Connection
+### Creating a Connection
+
+You can establish a database connection with `surreal:start_link/2` (or `surreal:start_link/3`).
+
+Check out SurrealDB URI format described in the [documentation](https://hexdocs.pm/surreal/surreal_config.html#module-surrealdb-uri-format).
 
 ```erlang
-1> {ok, Pid} = surreal:start_link("ws://localhost:8000").
-% {ok, <pid>}
-2> surreal:signin(Pid, "root", "root").
-% {ok, null}
-3> surreal:use(Pid, "test", "test").
-% {ok, null}
-4> surreal:create(Pid, "example:bob",
-4>  #{<<"name">> => <<"bob">>}).
-% {ok, #{<<"id">> => <<"example:bob">>, <<"name">> => <<"bob">>}},
-5> surreal:query(Pid, "SELECT * FROM type::table($tb);",
-5>    #{<<"tb">> => <<"test">>}).
-% [{ok, [#{<<"id">> => <<"example:bob">>, <<"name">> => <<"bob">>}]}]
+{ok, Pid} = surreal:start_link("surrealdb://root:root@localhost:8000/test/test", my_connection).
 ```
 
-### Connect with Config
+Alternatively, you can use the specified connection name, `my_connection`, in place of `Pid`, as shown below:
 
 ```erlang
-1> Config = [
-1>   % link the process
-1>   link,
-1>   % register local name
-1>   {name, example_client},
-1>   % host and port
-1>   {host, "localhost"},
-1>   {port, 8000},
-1>   % database, namespace to use
-1>   {use, {"test", "test"}},
-1>   % user, pass auth
-1>   {signin, {"root", "root"}}
-1> ].
-% ...
-2> {ok, Pid} = surreal_config:load(Config).
-% ...
-3> surreal:create(example_client, "example:bob",
-3>  #{<<"name">> => <<"bob">>}).
-% {ok, #{<<"id">> => <<"example:bob">>, <<"name">> => <<"bob">>}},
+{ok, Users} = surreal:select(my_connection, "users").
 ```
+
+### Example Usage
+
+SurrealDB Erlang offers users a clean API, demonstrated below:
+
+```erlang
+1> {ok, User} = surreal:create(Pid, "users:meppu", #{<<"score">> => 10}).
+   % {ok,#{<<"id">> => <<"users:meppu">>,<<"score">> => 10}}
+2> {ok, NewUser} = surreal:merge(Pid, "users:meppu", #{<<"new">> => <<"key">>}).
+   % {ok,#{<<"id">> => <<"users:meppu">>,<<"new">> => <<"key">>,
+   %       <<"score">> => 10}}
+3> [{ok, QueryResp}] = surreal:query(Pid, "SELECT * FROM users WHERE score = $score", #{<<"score">> => 10}).
+   % [{ok,[#{<<"id">> => <<"users:meppu">>,<<"new">> => <<"key">>,
+   %         <<"score">> => 10}]}]
+4> {ok, RemovedUser} = surreal:delete(Pid, "users:meppu").
+   % {ok,#{<<"id">> => <<"users:meppu">>,<<"new">> => <<"key">>,
+   %       <<"score">> => 10}}
+5> RemovedUser =:= NewUser.
+   % true
+```
+
+### With Supervisor
+
+The recommended approach to initialise a SurrealDB connection is through a supervisor.
+
+You can use `surreal:child_spec/1` to create a child specification for your supervisor, as shown below:
+
+```erlang
+%%% ...
+
+-behaviour(supervisor).
+
+%%% ...
+
+start_link() ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+
+init(_Args) ->
+    SupFlags = #{
+      % ...
+    },
+    ChildSpecs = [
+      surreal:child_spec({"surrealdb://root:root@localhost:8000/test/test", db_conn, #{}})
+    ],
+
+    {ok, {SupFlags, ChildSpecs}}.
+```
+
+### Additional Examples
+
+See additional examples in [examples/](/examples) folder.
 
 ## Documentation
 
-Documentation is available at [HexDocs](https://hexdocs.pm/surreal).
+For detailed documentation, please refer to [HexDocs](https://hexdocs.pm/surreal).
 
 ## Contributing
 
-You can always report bugs and request features via [GitHub Issues](/issues).
+Feel free to report bugs and request features through [GitHub Issues](/issues).
 
-For pull requests, make sure your code is well-formatted and at least can explain itself.
+If you wish to submit a pull request, ensure that your code is well-formatted and easily comprehensible.
+
+### Note for Contributors
+
+Please send your pull requests to `v2` branch instead of the `main` branch.
+
+This helps us demostrate a stable version on the `main` branch while allowing for ongoing development and improvements on the `v2` branch.
 
 ## License
 

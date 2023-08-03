@@ -15,7 +15,15 @@
           inherit inputs pkgs;
 
           default = pkgs.mkShell {
-            packages = with pkgs; [ erlang erlang-ls rebar3 ];
+            packages = with pkgs; [
+              # For Library Development
+              erlang
+              erlang-ls
+              rebar3
+
+              # For Elixir Example
+              elixir
+            ];
           };
         });
     };

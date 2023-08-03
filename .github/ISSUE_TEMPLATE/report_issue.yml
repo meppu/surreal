@@ -1,0 +1,60 @@
+name: Report an Issue
+description: Report anything that is not working as expected
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Your contribution is greatly appreciated! :heart:
+
+        Please don't use this form for asking questions or seeking support. Instead, feel free to use GitHub Discussions for any inquiries.
+
+  - type: input
+    id: surrealdb-version
+    attributes:
+      label: SurrealDB Version
+      description: Copy and paste the output of `surreal version`.
+      placeholder: "1.0.0-beta.9+20230723.432a6cc for linux on x86_64"
+    validations:
+      required: true
+
+  - type: input
+    id: library-version
+    attributes:
+      label: SurrealDB Erlang Version
+      description: Find the version of SurrealDB Erlang you are using and provide it below.
+      placeholder: "2.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment Information
+      description: Erlang/OTP version and any additional details to help us better understand your setup.
+      placeholder: "Elixir 1.14.5 (compiled with Erlang/OTP 25)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Please describe the steps necessary to reproduce this issue.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behaviour
+    attributes:
+      label: Current Behaviour
+      description: Include code samples, errors, and stacktraces if appropriate.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected Behaviour
+      description: A short description on how you expect the code to behave.
+    validations:
+      required: true

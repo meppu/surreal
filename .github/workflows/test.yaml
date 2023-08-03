@@ -1,8 +1,6 @@
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  - push
+  - pull_request
 
 permissions:
   contents: read
@@ -10,11 +8,11 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: OTP ${{ matrix.otp }}
+    name: Testing for Erlang/OTP ${{ matrix.otp }}
 
     strategy:
       matrix:
-        otp: ["26", "25", "24"]
+        otp: ["26.0.2", "25.3.2.5"]
       fail-fast: false
 
     steps:
@@ -22,7 +20,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
-          rebar3-version: "3.20.0"
+          rebar3-version: "3.22.1"
           install-hex: false
           version-type: strict
 
@@ -38,12 +36,19 @@ jobs:
       - name: Check Format
         run: rebar3 fmt --check
 
+      - name: Run Dialyzer
+        run: rebar3 dialyzer
+
+      - name: Run XRef
+        run: rebar3 xref
+
       - name: Set up SurrealDB
         run: |
-          docker run -d -p 8000:8000 \
-          surrealdb/surrealdb:latest \
-          start --user root --pass root \
-          memory
+          docker run -it -d --rm --name surrealdb -p 8000:8000 \
+          surrealdb/surrealdb:nightly start -u root -p root
 
       - name: Run Tests
-        run: rebar3 eunit --verbose
+        run: rebar3 ct --verbose
+
+      - name: Stop SurrealDB
+        run: docker stop -t 1 surrealdb
