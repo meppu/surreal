@@ -13,6 +13,20 @@ SurrealDB Erlang, also referred to as "surreal", is a robust and maintainable Su
 
 The library draws inspiration from the official [surrealdb.js](https://github.com/surrealdb/surrealdb.js) implementation.
 
+## Index
+
+- [Index](#index)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+  - [Creating a Connection](#creating-a-connection)
+  - [Example Usage](#example-usage)
+  - [With Supervisor](#with-supervisor)
+  - [Additional Examples](#additional-examples)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+  - [Note for Contributors](#note-for-contributors)
+- [License](#license)
+
 ## Installation
 
 Add `surreal` to your list of dependencies in `rebar.config` file:

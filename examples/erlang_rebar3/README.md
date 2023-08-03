@@ -2,6 +2,15 @@
 
 This exemplary Rebar3 project demonstrates the usage of the SurrealDB Erlang library in Erlang.
 
+## Index
+
+- [Example Erlang Rebar3 Project](#example-erlang-rebar3-project)
+  - [Index](#index)
+  - [Setup](#setup)
+    - [SurrealDB](#surrealdb)
+    - [Project](#project)
+  - [Running the Example](#running-the-example)
+
 ## Setup
 
 ### SurrealDB

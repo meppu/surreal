@@ -2,6 +2,15 @@
 
 This exemplary Mix project demonstrates the usage of the SurrealDB Erlang library in Elixir.
 
+## Index
+
+- [Example Elixir Mix Project](#example-elixir-mix-project)
+  - [Index](#index)
+  - [Setup](#setup)
+    - [SurrealDB](#surrealdb)
+    - [Project](#project)
+  - [Running the Example](#running-the-example)
+
 ## Setup
 
 ### SurrealDB
