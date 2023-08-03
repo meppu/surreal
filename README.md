@@ -8,7 +8,7 @@ Erlang driver for SurrealDB.
 
 </div>
 
-> ⚠️ You are currently viewing main branch ⚠️
+> ⚠️ You are currently viewing version 1 ⚠️
 
 Package name named as [surreal on hex](https://hex.pm/packages/surreal). Because an Erlang implementation can be used in other languages that runs on BEAM virtual machine, such as Elixir and Gleam.
 
