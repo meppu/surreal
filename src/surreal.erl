@@ -6,28 +6,11 @@
 %%%-------------------------------------------------------------------------
 -module(surreal).
 
--export([
-    child_spec/1,
-    start_link/2,
-    start_link/3,
-    close/1,
-    signin/3,
-    signin/2,
-    signup/2,
-    use/3,
-    authenticate/2,
-    invalidate/1,
-    query/3,
-    select/2,
-    create/3,
-    insert/3,
-    update/3,
-    merge/3,
-    patch/3,
-    delete/2,
-    set/3,
-    unset/2
-]).
+-export([child_spec/1, start_link/2, start_link/3, close/1]).
+-export([signin/3, signin/2, signup/2, use/3, authenticate/2, invalidate/1]).
+-export([query/3, select/2, create/3, insert/3, update/3, merge/3, patch/3, delete/2]).
+-export([set/3, unset/2]).
+
 -export_type([surreal_opts/0]).
 
 %%%==========================================================================
