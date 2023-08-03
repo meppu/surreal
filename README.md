@@ -100,6 +100,12 @@ Feel free to report bugs and request features through [GitHub Issues](/issues).
 
 If you wish to submit a pull request, ensure that your code is well-formatted and easily comprehensible.
 
+### Note for Contributors
+
+Please send your pull requests to `v2` branch instead of the `main` branch.
+
+This helps us demostrate a stable version on the `main` branch while allowing for ongoing development and improvements on the `v2` branch.
+
 ## License
 
 SurrealDB Erlang is licensed under the MIT License.
