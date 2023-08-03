@@ -6,6 +6,11 @@
 %%%
 %%% The SurrealDB URI format is an unofficial way to represent connection information for accessing SurrealDB.
 %%% It allows users to define various parameters necessary for establishing a connection to the database server.
+%%%
+%%% This format has been adopted and enhanced from
+%%% <a href="https://github.com/ri-nat/mylk#database-connection-string-format" target="_blank">mylk</a>,
+%%% a SurrealDB driver for Ruby.
+%%%
 %%% The URI format follows this format:
 %%%
 %%% - <strong>Plain TCP</strong>:

@@ -36,7 +36,7 @@ get_query_result(#{<<"time">> := _Time, <<"status">> := <<"ERR">>, <<"detail">> 
 get_query_result(#{<<"time">> := _Time, <<"status">> := <<"OK">>, <<"result">> := Result}) ->
     {ok, Result};
 get_query_result(List) when is_list(List) ->
-    lists:map(fun get_query_result/1, List).
+    [get_query_result(I) || I <- List].
 
 %% @private
 get_method_result(#{<<"error">> := #{<<"code">> := Code, <<"message">> := Message}}) ->
