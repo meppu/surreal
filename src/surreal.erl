@@ -44,18 +44,18 @@
 -type signin_opts() ::
     boolean()
     | (Vars :: map()).
-%% This is used to define options for the signin process.
-%% It provides four possible options:
+%% This is utilised to define options for the sign-in process.
+%% It offers four possible options:
 %%
 %% <dl>
 %%   <dt>`true'</dt>
-%%   <dd>This is the default option, and it indicates that the signin process is enabled and should be used with the given uri.</dd>
+%%   <dd>This is the default option, and it indicates that the sign-in process is enabled and should be used with the given URI.</dd>
 %%
 %%   <dt>`false'</dt>
-%%   <dd>This option stands for disabling the signin process entirely.</dd>
+%%   <dd>This option stands for disabling the sign-in process entirely.</dd>
 %%
 %%   <dt>`(Vars :: map())'</dt>
-%%   <dd>This option provides flexibility for custom signin options.</dd>
+%%   <dd>This option provides flexibility for custom sign-in options.</dd>
 %% </dl>
 
 -type use_opts() :: boolean().
@@ -91,7 +91,8 @@ child_spec({Uri, ConnName, Opts}) ->
     }.
 
 %%-------------------------------------------------------------------------
-%% @doc Connects to a local or remote database endpoint with extra options. Pretty much same with {@link surreal:start_link/2} with an extra argument.
+%% @doc Connects to a local or remote database endpoint with additional options.
+%% Essentially the same as {@link surreal:start_link/2} but with an extra argument.
 %%
 %% - `Opts' allows you to provide custom options.
 %%
@@ -141,11 +142,11 @@ start_link(Uri, ConnName, Opts) ->
     end.
 
 %%-------------------------------------------------------------------------
-%% @doc Connects to a local or remote database endpoint.
+%% @doc Establishes a connection to a local or remote database endpoint.
 %%
-%% - `Uri' must be a valid SurrealDB URI. Visit {@link surreal_config} for more information.
+%% - `Uri' must be a valid SurrealDB URI. For more information, visit {@link surreal_config}.
 %%
-%% - `ConnName' allows you to set a name for connection so you can use given name instead of pid while using SurrealDB.
+%% - `ConnName' allows you to set a name for the connection, so you can use the given name instead of pid while using SurrealDB.
 %%
 %% ```
 %1> Uri = "surrealdb://root:root@localhost:8000/surrealdb/docs".
@@ -173,7 +174,7 @@ close(Pid) ->
     surreal_connection:close(Pid).
 
 %%-------------------------------------------------------------------------
-%% @doc Signs in to the database with username and password.
+%% @doc Signs in to the database with a username and password.
 %%
 %% ```
 %1> surreal:signin(Pid, "root", "root").
@@ -196,7 +197,7 @@ signin(Pid, Username, Password) ->
 %%
 %% For more information about `Vars', view
 %% <a href="https://surrealdb.com/docs/integration/websocket/text#signin" target="_blank">SurrealDB documentation</a>
-%% and
+%% and the
 %% <a href="https://surrealdb.com/docs/integration/sdks/nodejs#signin" target="_blank">JavaScript SDK</a>.
 %%
 %% ```
@@ -220,7 +221,7 @@ signin(Pid, Vars) ->
 %%
 %% For more information about `Vars', view
 %% <a href="https://surrealdb.com/docs/integration/websocket/text#signup" target="_blank">SurrealDB documentation</a>
-%% and
+%% and the
 %% <a href="https://surrealdb.com/docs/integration/sdks/nodejs#signup" target="_blank">JavaScript SDK</a>.
 %%
 %% ```
@@ -283,7 +284,7 @@ invalidate(Pid) ->
     send_handle_message(Pid, <<"invalidate">>, null).
 
 %%-------------------------------------------------------------------------
-%% @doc Runs a set of SurrealQL statements against the database.
+%% @doc Executes a set of SurrealQL statements against the database.
 %%
 %% ```
 %1> [{ok, Result}] = surreal:query(Pid, "SELECT * FROM authorised WHERE user = $user", #{<<"user">> => <<"A">>}).
@@ -298,7 +299,7 @@ query(Pid, Query, Variables) ->
     send_handle_query_message(Pid, <<"query">>, Params).
 
 %%-------------------------------------------------------------------------
-%% @doc Selects all records in a table, or a specific record.
+%% @doc Retrieves all records in a table or a specific record.
 %%
 %% ```
 %1> {ok, Result} = surreal:select(Pid, "authorised").
@@ -358,7 +359,7 @@ insert(Pid, Thing, Data) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Updates all records in a table, or a specific record, in the database.
-%% This function replaces the current document / record data with the specified data.
+%% This function replaces the current document/record data with the specified data.
 %%
 %% ```
 %1> NewData = #{<<"name">> => <<"meppu">>, <<"identify">> => <<"human">>}.
@@ -376,7 +377,7 @@ update(Pid, Thing, Data) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Modifies all records in a table, or a specific record, in the database.
-%% This function merges the current document / record data with the specified data.
+%% This function merges the current document/record data with the specified data.
 %%
 %% ```
 %1> MergeData = #{<<"score">> => 10}.
@@ -394,7 +395,7 @@ merge(Pid, Thing, Data) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Applies JSON Patch changes to all records, or a specific record, in the database.
-%% This function patches the current document / record data with the specified JSON Patch data.
+%% This function patches the current document/record data with the specified JSON Patch data.
 %%
 %% ```
 %1> Patches = [{replace, "/name", <<"tuhana">>}, {remove, "/score"}].

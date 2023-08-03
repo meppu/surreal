@@ -1,12 +1,12 @@
 %%%-------------------------------------------------------------------------
 %%% @copyright (C) 2023, meppu
-%%% @doc Connection configuration module for SurrealDB driver.
+%%% @doc Connection configuration module for SurrealDB Erlang.
 %%%
 %%% == SurrealDB URI Format ==
 %%%
-%%% The SurrealDB URI format is an unofficial way to represent connection information
-%%% for accessing SurrealDB. It allows users to define various parameters necessary
-%%% for establishing a connection to the database server. The URI format follows the format:
+%%% The SurrealDB URI format is an unofficial way to represent connection information for accessing SurrealDB. 
+%%% It allows users to define various parameters necessary for establishing a connection to the database server. 
+%%% The URI format follows this format:
 %%%
 %%% - <strong>Plain TCP</strong>:
 %%%   `surrealdb://username:password@host:port/namespace/database'
