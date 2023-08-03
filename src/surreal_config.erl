@@ -4,8 +4,8 @@
 %%%
 %%% == SurrealDB URI Format ==
 %%%
-%%% The SurrealDB URI format is an unofficial way to represent connection information for accessing SurrealDB. 
-%%% It allows users to define various parameters necessary for establishing a connection to the database server. 
+%%% The SurrealDB URI format is an unofficial way to represent connection information for accessing SurrealDB.
+%%% It allows users to define various parameters necessary for establishing a connection to the database server.
 %%% The URI format follows this format:
 %%%
 %%% - <strong>Plain TCP</strong>:
