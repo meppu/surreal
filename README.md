@@ -29,6 +29,8 @@ The library draws inspiration from the official [surrealdb.js](https://github.co
 
 ## Installation
 
+SurrealDB Erlang is available on [Hex.pm](https://hex.pm/packages/surreal).
+
 Add `surreal` to your list of dependencies in `rebar.config` file:
 
 ```erlang
