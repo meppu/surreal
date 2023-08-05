@@ -48,7 +48,7 @@ jobs:
           surrealdb/surrealdb:nightly start -u root -p root
 
       - name: Run Tests
-        run: rebar3 ct --verbose
+        run: rebar3 do ct --verbose, cover
 
       - name: Stop SurrealDB
         run: docker stop -t 1 surrealdb
