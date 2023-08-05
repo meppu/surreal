@@ -116,7 +116,7 @@ users_patch(Config) ->
     Pid = ?config(db, Config),
 
     PatchData = [{remove, "/verified"}, {replace, "/age", 16}],
-    
+
     {ok, Patches} = surreal:patch(Pid, "users:meppu", PatchData),
     ?assert(is_list(Patches)).
 
