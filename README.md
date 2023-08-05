@@ -14,6 +14,8 @@ SurrealDB Erlang, also referred to as "surreal", is a robust and maintainable Su
 The library draws inspiration from the official [surrealdb.js](https://github.com/surrealdb/surrealdb.js) implementation.
 
 ## Index
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmeppu%2Fsurreal.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmeppu%2Fsurreal?ref=badge_shield)
+
 
 - [Index](#index)
 - [Installation](#installation)
@@ -125,3 +127,6 @@ This helps us demostrate a stable version on the `main` branch while allowing fo
 ## License
 
 SurrealDB Erlang is licensed under the MIT License.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmeppu%2Fsurreal.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmeppu%2Fsurreal?ref=badge_large)
