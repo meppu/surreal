@@ -6,7 +6,7 @@
 %%%-------------------------------------------------------------------------
 -module(surreal).
 
--export([child_spec/1, start_link/2, start_link/3, close/1]).
+-export([child_spec/1, start_link/2, start_link/3, ping/1, close/1]).
 -export([signin/3, signin/2, signup/2, use/3, authenticate/2, invalidate/1]).
 -export([query/2, query/3, select/2, create/3, insert/3, update/3, merge/3, patch/3, delete/2]).
 -export([set/3, unset/2]).
@@ -142,6 +142,20 @@ start_link(Uri, ConnName, Opts) ->
 -spec start_link(Uri :: nonempty_string(), ConnName :: atom()) -> gen_server:start_ret().
 start_link(Uri, ConnName) ->
     start_link(Uri, ConnName, #{}).
+
+%%-------------------------------------------------------------------------
+%% @since 2.1.0
+%% @doc Ping SurrealDB instance.
+%%
+%% ```
+%1> surreal:ping(Pid).
+%%  % {ok,null}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec ping(surreal_pid()) -> surreal_result:result().
+ping(Pid) ->
+    send_handle_message(Pid, <<"ping">>, null).
 
 %%-------------------------------------------------------------------------
 %% @doc Closes the persistent connection to the database.
