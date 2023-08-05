@@ -33,6 +33,8 @@ get_query_result(#{<<"error">> := #{<<"code">> := Code, <<"message">> := Message
     {error, Code, Message};
 get_query_result(#{<<"time">> := _Time, <<"status">> := <<"ERR">>, <<"detail">> := Message}) ->
     {error, Message};
+get_query_result(#{<<"time">> := _Time, <<"status">> := <<"ERR">>, <<"result">> := Message}) ->
+    {error, Message};
 get_query_result(#{<<"time">> := _Time, <<"status">> := <<"OK">>, <<"result">> := Result}) ->
     {ok, Result};
 get_query_result(List) when is_list(List) ->
