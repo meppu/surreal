@@ -50,6 +50,9 @@ jobs:
       - name: Run Tests
         run: rebar3 do ct --verbose, cover
 
+      - name: Format coverage
+        run: rebar3 codecov analyze
+
       - name: Stop SurrealDB
         run: docker stop -t 1 surrealdb
 
