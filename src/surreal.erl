@@ -8,7 +8,7 @@
 
 -export([child_spec/1, start_link/2, start_link/3, close/1]).
 -export([signin/3, signin/2, signup/2, use/3, authenticate/2, invalidate/1]).
--export([query/3, select/2, create/3, insert/3, update/3, merge/3, patch/3, delete/2]).
+-export([query/2, query/3, select/2, create/3, insert/3, update/3, merge/3, patch/3, delete/2]).
 -export([set/3, unset/2]).
 
 -export_type([surreal_opts/0]).
@@ -267,8 +267,31 @@ invalidate(Pid) ->
     send_handle_message(Pid, <<"invalidate">>, null).
 
 %%-------------------------------------------------------------------------
+%% @since 2.1.0
 %% @doc Executes a set of SurrealQL statements against the database.
 %%
+%% ```
+%1> [{ok, Result}] = surreal:query(Pid, "SELECT * FROM authorised").
+%%  % {ok,[#{<<"id">> => <<"authorised:3n4mn5wsq823i7pgv9un">>,
+%%  %        <<"user">> => <<"A">>},
+%%  %      #{<<"id">> => <<"authorised:raedq65doxhpuc6t3meo">>,
+%%  %        <<"user">> => <<"B">>}]}
+%% '''
+%% @end
+%%-------------------------------------------------------------------------
+-spec query(surreal_pid(), Query :: iodata()) -> surreal_result:result().
+query(Pid, Query) ->
+    query(Pid, Query, #{}).
+
+%%-------------------------------------------------------------------------
+%% @doc Executes a set of SurrealQL statements against the database with variables.
+%%
+%% This function is similar to {@link query/2}, but allows you to provide a map of variables
+%% that can be used in the query.
+%% 
+%% This can be useful for dynamic queries where you need to parametrise certain parts
+%% of the query.
+%% 
 %% ```
 %1> [{ok, Result}] = surreal:query(Pid, "SELECT * FROM authorised WHERE user = $user", #{<<"user">> => <<"A">>}).
 %%  % [{ok,[#{<<"id">> => <<"authorised:3n4mn5wsq823i7pgv9un">>,

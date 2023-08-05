@@ -2,23 +2,8 @@
 -module(surreal_connection).
 -behaviour(gen_server).
 
--export([
-    %%==============
-    %% Client
-    %%==============
-    start_link/2,
-    send_message/3,
-    send_and_wait/2,
-    close/1,
-    %%==============
-    %% Server
-    %%==============
-    init/1,
-    handle_call/3,
-    handle_cast/2,
-    handle_info/2,
-    terminate/2
-]).
+-export([start_link/2, send_message/3, send_and_wait/2, close/1]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2]).
 
 %%%==========================================================================
 %%%
