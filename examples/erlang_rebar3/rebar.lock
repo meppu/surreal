@@ -2,10 +2,7 @@
 [{<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.12.1">>},2},
  {<<"gun">>,{pkg,<<"gun">>,<<"2.0.1">>},1},
  {<<"jsx">>,{pkg,<<"jsx">>,<<"3.1.0">>},1},
- {<<"surreal">>,
-  {git,"https://github.com/meppu/surreal.git",
-       {ref,"15e8b6963f10f94d8a91e8db7e3e47dba6b59264"}},
-  0}]}.
+ {<<"surreal">>,{path,"../../",{mtime,<<"2023-08-05T14:53:06Z">>}},0}]}.
 [
 {pkg_hash,[
  {<<"cowlib">>, <<"A9FA9A625F1D2025FE6B462CB865881329B5CAFF8F1854D1CBC9F9533F00E1E1">>},
