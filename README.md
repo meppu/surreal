@@ -82,29 +82,14 @@ The recommended approach to initialise a SurrealDB connection is through a super
 You can use `surreal:child_spec/1` to create a child specification for your supervisor, as shown below:
 
 ```erlang
-%%% ...
-
--behaviour(supervisor).
-
-%%% ...
-
-start_link() ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
-
-init(_Args) ->
-    SupFlags = #{
-      % ...
-    },
-    ChildSpecs = [
-      surreal:child_spec({"surrealdb://root:root@localhost:8000/test/test", db_conn, #{}})
-    ],
-
-    {ok, {SupFlags, ChildSpecs}}.
+ChildSpecs = [
+    surreal:child_spec({"surrealdb://root:root@localhost:8000/test/test", db_conn, #{}})
+],
 ```
 
 ### Additional Examples
 
-See additional examples in [examples/](/examples) folder.
+See additional examples in [examples/](https://github.com/meppu/surreal/tree/main/examples) folder.
 
 ## Documentation
 
@@ -112,7 +97,7 @@ For detailed documentation, please refer to [HexDocs](https://hexdocs.pm/surreal
 
 ## Contributing
 
-Feel free to report bugs and request features through [GitHub Issues](/issues).
+Feel free to report bugs and request features through [GitHub Issues](https://github.com/meppu/surreal/issues).
 
 If you wish to submit a pull request, ensure that your code is well-formatted and easily comprehensible.
 

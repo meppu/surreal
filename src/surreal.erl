@@ -28,7 +28,7 @@
     boolean()
     | (Vars :: map()).
 %% This is utilised to define options for the sign-in process.
-%% It offers four possible options:
+%% It offers three possible options:
 %%
 %% <dl>
 %%   <dt>`true'</dt>
@@ -288,10 +288,10 @@ query(Pid, Query) ->
 %%
 %% This function is similar to {@link query/2}, but allows you to provide a map of variables
 %% that can be used in the query.
-%% 
+%%
 %% This can be useful for dynamic queries where you need to parametrise certain parts
 %% of the query.
-%% 
+%%
 %% ```
 %1> [{ok, Result}] = surreal:query(Pid, "SELECT * FROM authorised WHERE user = $user", #{<<"user">> => <<"A">>}).
 %%  % [{ok,[#{<<"id">> => <<"authorised:3n4mn5wsq823i7pgv9un">>,
