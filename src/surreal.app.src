@@ -1,6 +1,6 @@
 {application, surreal, [
     {description, "Erlang driver for SurrealDB"},
-    {vsn, "2.0.0"},
+    {vsn, "2.1.0"},
     {registered, []},
     {applications, [
         kernel,

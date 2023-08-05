@@ -34,7 +34,7 @@ SurrealDB Erlang is available on [Hex.pm](https://hex.pm/packages/surreal).
 Add `surreal` to your list of dependencies in `rebar.config` file:
 
 ```erlang
-{deps, [{surreal, "2.0.0"}]}.
+{deps, [{surreal, "2.1.0"}]}.
 ```
 
 ## Getting Started
