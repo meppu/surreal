@@ -5,7 +5,12 @@
 <h2>SurrealDB Erlang</h2>
 <p>SurrealDB driver for BEAM ecosystem</p>
 
-<strong>⚠️ You are currently viewing version 2 ⚠️</strong>
+[![codecov](https://codecov.io/gh/meppu/surreal/branch/main/graph/badge.svg?token=LX33ZWN777)](https://codecov.io/gh/meppu/surreal)
+![license](https://img.shields.io/hexpm/l/surreal)
+![downloads](https://img.shields.io/hexpm/dt/surreal)
+![test-status](https://img.shields.io/github/actions/workflow/status/meppu/surreal/test.yaml?label=tests)
+
+<h6>⚠️ You are currently viewing version 2 ⚠️</h6>
 
 </div>
 
