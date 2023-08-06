@@ -105,21 +105,26 @@ parse(Uri) ->
             scheme := Scheme,
             userinfo := UserInfo
         } = Parsed ->
-            {ok, Tls} = parse_scheme(Scheme),
-            {ok, [Username, Password]} = parse_userinfo(UserInfo),
-            {ok, [Namespace, Database]} = parse_path(Path),
-            {ok, Timeout} = parse_timeout(maps:get(query, Parsed, "timeout=5000")),
+            try
+                {ok, Tls} = parse_scheme(Scheme),
+                {ok, [Username, Password]} = parse_userinfo(UserInfo),
+                {ok, [Namespace, Database]} = parse_path(Path),
+                {ok, Timeout} = parse_timeout(maps:get(query, Parsed, "timeout=5000")),
 
-            {ok, #{
-                host => Host,
-                username => Username,
-                password => Password,
-                namespace => Namespace,
-                database => Database,
-                port => Port,
-                tls => Tls,
-                timeout => Timeout
-            }};
+                {ok, #{
+                    host => Host,
+                    username => Username,
+                    password => Password,
+                    namespace => Namespace,
+                    database => Database,
+                    port => Port,
+                    tls => Tls,
+                    timeout => Timeout
+                }}
+            catch
+                error:{badmatch, Error} ->
+                    Error
+            end;
         {error, _, _} = Error ->
             Error;
         _ ->
@@ -159,7 +164,12 @@ parse_timeout(RawQuery) ->
     ParsedQuery = uri_string:dissect_query(RawQuery),
     case lists:keysearch("timeout", 1, ParsedQuery) of
         {value, {"timeout", Timeout}} ->
-            {ok, list_to_integer(Timeout)};
+            case string:to_integer(Timeout) of
+                {Int, []} ->
+                    {ok, Int};
+                _ ->
+                    {error, invalid_timeout}
+            end;
         _Other ->
             {error, invalid_query}
     end.
