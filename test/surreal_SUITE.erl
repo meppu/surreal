@@ -11,6 +11,7 @@
     users_merge/1,
     users_patch/1,
     users_select/1,
+    users_patch2/1,
     users_delete/1,
     users_insert/1,
     users_query/1
@@ -39,6 +40,7 @@ groups() ->
             users_merge,
             users_patch,
             users_select,
+            users_patch2,
             users_delete,
             users_insert,
             users_query
@@ -106,16 +108,27 @@ users_update(Config) ->
 users_merge(Config) ->
     Pid = ?config(db, Config),
 
-    MergeData = #{<<"verified">> => true},
+    MergeData = #{<<"verified">> => true, <<"other">> => <<"test">>},
     Response = surreal:merge(Pid, "users:meppu", MergeData),
 
-    Expected = {ok, #{<<"id">> => <<"users:meppu">>, <<"age">> => 18, <<"verified">> => true}},
+    Expected =
+        {ok, #{
+            <<"id">> => <<"users:meppu">>,
+            <<"age">> => 18,
+            <<"verified">> => true,
+            <<"other">> => <<"test">>
+        }},
     ?assertEqual(Expected, Response).
 
 users_patch(Config) ->
     Pid = ?config(db, Config),
 
-    PatchData = [{remove, "/verified"}, {replace, "/age", 16}],
+    PatchData = [
+        {add, "/extra", true},
+        {remove, "/verified"},
+        {replace, "/age", 16},
+        {diff, "/other", <<"@@ -1,4 +1,4 @@\n te\n-s\n+x\n t\n">>}
+    ],
 
     {ok, Patches} = surreal:patch(Pid, "users:meppu", PatchData),
     ?assert(is_list(Patches)).
@@ -125,8 +138,25 @@ users_select(Config) ->
 
     Response = surreal:select(Pid, "users:meppu"),
 
-    Expected = {ok, #{<<"id">> => <<"users:meppu">>, <<"age">> => 16}},
+    Expected =
+        {ok, #{
+            <<"id">> => <<"users:meppu">>,
+            <<"age">> => 16,
+            <<"extra">> => true,
+            <<"other">> => <<"text">>
+        }},
     ?assertEqual(Expected, Response).
+
+users_patch2(Config) ->
+    Pid = ?config(db, Config),
+
+    PatchData = [
+        {remove, "/extra"},
+        {remove, "/other"}
+    ],
+
+    {ok, Patches} = surreal:patch(Pid, "users:meppu", PatchData),
+    ?assert(is_list(Patches)).
 
 users_delete(Config) ->
     Pid = ?config(db, Config),

@@ -26,7 +26,8 @@
     | patch_replace()
     | patch_copy()
     | patch_move()
-    | patch_test().
+    | patch_test()
+    | patch_diff().
 %% Combination of all patch types.
 
 -type patch_add() :: {add, Path :: iodata(), Value :: term()}.
@@ -51,6 +52,10 @@
 -type patch_test() :: {test, Path :: iodata(), Value :: term()}.
 %% Tests that the specified value is set in the document.
 %% If the test fails, then the patch as a whole should not apply.
+
+-type patch_diff() :: {diff, Path :: iodata(), Value :: iodata()}.
+%% Applies a diff to the document.
+%% Value field contains the actual diff to be applied.
 
 %%%==========================================================================
 %%%
@@ -99,4 +104,10 @@ convert({test, Path, Value}) ->
         <<"op">> => <<"test">>,
         <<"path">> => unicode:characters_to_binary(Path),
         <<"value">> => Value
+    };
+convert({diff, Path, Value}) ->
+    #{
+        <<"op">> => <<"change">>,
+        <<"path">> => unicode:characters_to_binary(Path),
+        <<"value">> => unicode:characters_to_binary(Value)
     }.
