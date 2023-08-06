@@ -75,7 +75,8 @@ child_spec({Uri, ConnName, Opts}) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Connects to a local or remote database endpoint with additional options.
-%% Essentially the same as {@link surreal:start_link/2} but with an extra argument.
+%% 
+%% Essentially the same as {@link surreal:start_link/2} but with an extra argument:
 %%
 %% - `Opts' allows you to provide custom options.
 %%
@@ -379,6 +380,7 @@ insert(Pid, Thing, Data) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Updates all records in a table, or a specific record, in the database.
+%% 
 %% This function replaces the current document/record data with the specified data.
 %%
 %% ```
@@ -397,6 +399,7 @@ update(Pid, Thing, Data) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Modifies all records in a table, or a specific record, in the database.
+%% 
 %% This function merges the current document/record data with the specified data.
 %%
 %% ```
@@ -415,6 +418,7 @@ merge(Pid, Thing, Data) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Applies JSON Patch changes to all records, or a specific record, in the database.
+%%
 %% This function patches the current document/record data with the specified JSON Patch data.
 %%
 %% ```

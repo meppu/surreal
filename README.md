@@ -1,17 +1,17 @@
 <div align="center">
+   <img src="https://raw.githubusercontent.com/meppu/surreal/main/.github/assets/banner.webp" alt="banner" />
 
-<img src="https://raw.githubusercontent.com/meppu/surreal/main/.github/assets/banner.webp" alt="banner" />
+   <h2>SurrealDB Erlang</h2>
+   <p>SurrealDB driver for BEAM ecosystem</p>
 
-<h2>SurrealDB Erlang</h2>
-<p>SurrealDB driver for BEAM ecosystem</p>
+   <a href="https://codecov.io/gh/meppu/surreal" target="_blank">
+      <img src="https://codecov.io/gh/meppu/surreal/branch/main/graph/badge.svg?token=LX33ZWN777" alt="codecov" />
+   </a>
+   <img src="https://img.shields.io/hexpm/l/surreal" alt="license" />
+   <img src="https://img.shields.io/hexpm/dt/surreal" alt="downloads" />
+   <img src="https://img.shields.io/github/actions/workflow/status/meppu/surreal/test.yaml?label=tests" alt="tests" />
 
-[![codecov](https://codecov.io/gh/meppu/surreal/branch/main/graph/badge.svg?token=LX33ZWN777)](https://codecov.io/gh/meppu/surreal)
-![license](https://img.shields.io/hexpm/l/surreal)
-![downloads](https://img.shields.io/hexpm/dt/surreal)
-![test-status](https://img.shields.io/github/actions/workflow/status/meppu/surreal/test.yaml?label=tests)
-
-<h6>⚠️ You are currently viewing version 2 ⚠️</h6>
-
+   <h5>⚠️ You are currently viewing version 2 ⚠️</h5>
 </div>
 
 SurrealDB Erlang, also referred to as "surreal", is a robust and maintainable SurrealDB driver for BEAM ecosystem.
