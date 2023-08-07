@@ -33,7 +33,7 @@ jobs:
       - name: Compile Project
         run: rebar3 compile
 
-      - name: Check Format
+      - name: Verify Formatting
         run: rebar3 fmt --check
 
       - name: Run Dialyzer
@@ -50,13 +50,13 @@ jobs:
       - name: Run Tests
         run: rebar3 do ct --verbose, cover
 
-      - name: Format coverage
+      - name: Format Coverage for Codecov
         run: rebar3 codecov analyze
 
       - name: Stop SurrealDB
         run: docker stop -t 1 surrealdb
 
-      - name: Upload coverage reports to Codecov
+      - name: Upload Coverage Reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
