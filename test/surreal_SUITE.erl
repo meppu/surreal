@@ -91,7 +91,7 @@ users_create(Config) ->
     Pid = ?config(db, Config),
 
     Data = #{<<"age">> => 16},
-    Response = surreal:create(Pid, "users:meppu", Data),
+    Response = surreal:create(Pid, {"users", "meppu"}, Data),
 
     Expected = {ok, #{<<"id">> => <<"users:meppu">>, <<"age">> => 16}},
     ?assertEqual(Expected, Response).
@@ -100,7 +100,7 @@ users_update(Config) ->
     Pid = ?config(db, Config),
 
     NewData = #{<<"age">> => 18},
-    Response = surreal:update(Pid, "users:meppu", NewData),
+    Response = surreal:update(Pid, {"users", "meppu"}, NewData),
 
     Expected = {ok, #{<<"id">> => <<"users:meppu">>, <<"age">> => 18}},
     ?assertEqual(Expected, Response).
@@ -109,7 +109,7 @@ users_merge(Config) ->
     Pid = ?config(db, Config),
 
     MergeData = #{<<"verified">> => true, <<"other">> => <<"test">>},
-    Response = surreal:merge(Pid, "users:meppu", MergeData),
+    Response = surreal:merge(Pid, {"users", "meppu"}, MergeData),
 
     Expected =
         {ok, #{
@@ -130,13 +130,13 @@ users_patch(Config) ->
         {diff, "/other", <<"@@ -1,4 +1,4 @@\n te\n-s\n+x\n t\n">>}
     ],
 
-    {ok, Patches} = surreal:patch(Pid, "users:meppu", PatchData),
+    {ok, Patches} = surreal:patch(Pid, {"users", "meppu"}, PatchData),
     ?assert(is_list(Patches)).
 
 users_select(Config) ->
     Pid = ?config(db, Config),
 
-    Response = surreal:select(Pid, "users:meppu"),
+    Response = surreal:select(Pid, {"users", "meppu"}),
 
     Expected =
         {ok, #{
@@ -155,13 +155,13 @@ users_patch2(Config) ->
         {remove, "/other"}
     ],
 
-    {ok, Patches} = surreal:patch(Pid, "users:meppu", PatchData),
+    {ok, Patches} = surreal:patch(Pid, {"users", "meppu"}, PatchData),
     ?assert(is_list(Patches)).
 
 users_delete(Config) ->
     Pid = ?config(db, Config),
 
-    Response = surreal:delete(Pid, "users:meppu"),
+    Response = surreal:delete(Pid, {"users", "meppu"}),
 
     Expected = {ok, #{<<"id">> => <<"users:meppu">>, <<"age">> => 16}},
     ?assertEqual(Expected, Response).

@@ -75,7 +75,7 @@ child_spec({Uri, ConnName, Opts}) ->
 
 %%-------------------------------------------------------------------------
 %% @doc Connects to a local or remote database endpoint with additional options.
-%% 
+%%
 %% Essentially the same as {@link surreal:start_link/2} but with an extra argument:
 %%
 %% - `Opts' allows you to provide custom options.
@@ -328,15 +328,15 @@ query(Pid, Query, Variables) ->
 %%  %        <<"user">> => <<"A">>},
 %%  %      #{<<"id">> => <<"authorised:raedq65doxhpuc6t3meo">>,
 %%  %        <<"user">> => <<"B">>}]}
-%2> {ok, Result2} = surreal:select(Pid, "users:meppu").
+%2> {ok, Result2} = surreal:select(Pid, {"users", "meppu"}).
 %%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"cat">>,
 %%  %       <<"name">> => <<"meppu">>}}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec select(surreal_pid(), Thing :: iodata()) -> surreal_result:result().
+-spec select(surreal_pid(), Thing :: surreal_entity:thing()) -> surreal_result:result().
 select(Pid, Thing) ->
-    Params = [unicode:characters_to_binary(Thing)],
+    Params = [unicode:characters_to_binary(surreal_entity:convert(Thing))],
     send_handle_message(Pid, <<"select">>, Params).
 
 %%-------------------------------------------------------------------------
@@ -345,15 +345,19 @@ select(Pid, Thing) ->
 %% ```
 %1> User = #{<<"name">> => <<"meppu">>, <<"identify">> => <<"cat">>}.
 %%  % #{<<"identify">> => <<"cat">>,<<"name">> => <<"meppu">>}
-%2> {ok, Created} = surreal:create(Pid, "users:meppu", User).
+%2> {ok, Created} = surreal:create(Pid, {"users", "meppu"}, User).
 %%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"cat">>,
 %%  %       <<"name">> => <<"meppu">>}}
+%3> {ok, Created2} = surreal:create(Pid, "users", User).
+%%  % {ok,[#{<<"id">> => <<"users:pmqsma4cqhescl1wlsi1">>,
+%%  %        <<"identify">> => <<"cat">>,<<"name">> => <<"meppu">>}]}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec create(surreal_pid(), Thing :: iodata(), Data :: map() | null) -> surreal_result:result().
+-spec create(surreal_pid(), Thing :: surreal_entity:thing(), Data :: map() | null) ->
+    surreal_result:result().
 create(Pid, Thing, Data) ->
-    Params = [unicode:characters_to_binary(Thing), Data],
+    Params = [unicode:characters_to_binary(surreal_entity:convert(Thing)), Data],
     send_handle_message(Pid, <<"create">>, Params).
 
 %%-------------------------------------------------------------------------
@@ -372,48 +376,52 @@ create(Pid, Thing, Data) ->
 %% @end
 %%-------------------------------------------------------------------------
 -spec insert(surreal_pid(), Thing, Data) -> surreal_result:result() when
-    Thing :: iodata(),
+    Thing :: surreal_entity:thing(),
     Data :: map() | list(map()).
 insert(Pid, Thing, Data) ->
-    Params = [unicode:characters_to_binary(Thing), Data],
+    Params = [unicode:characters_to_binary(surreal_entity:convert(Thing)), Data],
     send_handle_message(Pid, <<"insert">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Updates all records in a table, or a specific record, in the database.
-%% 
+%%
 %% This function replaces the current document/record data with the specified data.
 %%
 %% ```
 %1> NewData = #{<<"name">> => <<"meppu">>, <<"identify">> => <<"human">>}.
 %%  % #{<<"identify">> => <<"human">>,<<"name">> => <<"meppu">>}
-%2> {ok, Updated} = surreal:update(Pid, "users:meppu", NewData).
+%2> {ok, Updated} = surreal:update(Pid, {"users", "meppu"}, NewData).
 %%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"human">>,
 %%  %       <<"name">> => <<"meppu">>}}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec update(surreal_pid(), Thing :: iodata(), NewData :: map() | null) -> surreal_result:result().
+-spec update(surreal_pid(), Thing, NewData) -> surreal_result:result() when
+    Thing :: surreal_entity:thing(),
+    NewData :: map() | null.
 update(Pid, Thing, Data) ->
-    Params = [unicode:characters_to_binary(Thing), Data],
+    Params = [unicode:characters_to_binary(surreal_entity:convert(Thing)), Data],
     send_handle_message(Pid, <<"update">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Modifies all records in a table, or a specific record, in the database.
-%% 
+%%
 %% This function merges the current document/record data with the specified data.
 %%
 %% ```
 %1> MergeData = #{<<"score">> => 10}.
 %%  % #{<<"score">> => 10}
-%2> {ok, Updated} = surreal:merge(Pid, "users:meppu", MergeData).
+%2> {ok, Updated} = surreal:merge(Pid, {"users", "meppu"}, MergeData).
 %%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"human">>,
 %%  %       <<"name">> => <<"meppu">>,<<"score">> => 10}}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec merge(surreal_pid(), Thing :: iodata(), Data :: map() | null) -> surreal_result:result().
+-spec merge(surreal_pid(), Thing, Data) -> surreal_result:result() when
+    Thing :: surreal_entity:thing(),
+    Data :: map() | null.
 merge(Pid, Thing, Data) ->
-    Params = [unicode:characters_to_binary(Thing), Data],
+    Params = [unicode:characters_to_binary(surreal_entity:convert(Thing)), Data],
     send_handle_message(Pid, <<"merge">>, Params).
 
 %%-------------------------------------------------------------------------
@@ -424,7 +432,7 @@ merge(Pid, Thing, Data) ->
 %% ```
 %1> Patches = [{replace, "/name", <<"tuhana">>}, {remove, "/score"}].
 %%  % [{replace,"/name",<<"tuhana">>},{remove,"/score"}]
-%2> surreal:patch(database, "users:meppu", Patches).
+%2> surreal:patch(database, {"users", "meppu"}, Patches).
 %%  % {ok,[#{<<"op">> => <<"remove">>,<<"path">> => <<"/score">>,
 %%  %        <<"value">> => null},
 %%  %      #{<<"op">> => <<"change">>,<<"path">> => <<"/name">>,
@@ -433,25 +441,28 @@ merge(Pid, Thing, Data) ->
 %% @end
 %%-------------------------------------------------------------------------
 -spec patch(surreal_pid(), Thing, JSONPatch) -> surreal_result:result() when
-    Thing :: iodata(),
+    Thing :: surreal_entity:thing(),
     JSONPatch :: list(surreal_patch:patch()) | null.
 patch(Pid, Thing, JSONPatch) ->
-    Params = [unicode:characters_to_binary(Thing), surreal_patch:convert(JSONPatch)],
+    Params = [
+        unicode:characters_to_binary(surreal_entity:convert(Thing)),
+        surreal_patch:convert(JSONPatch)
+    ],
     send_handle_message(Pid, <<"patch">>, Params).
 
 %%-------------------------------------------------------------------------
 %% @doc Deletes all records in a table, or a specific record, from the database.
 %%
 %% ```
-%1> {ok, Deleted} = surreal:merge(Pid, "users:meppu").
+%1> {ok, Deleted} = surreal:merge(Pid, {"users", "meppu"}).
 %%  % {ok,#{<<"id">> => <<"users:meppu">>,<<"identify">> => <<"human">>,
 %%  %       <<"name">> => <<"meppu">>,<<"score">> => 10}}
 %% '''
 %% @end
 %%-------------------------------------------------------------------------
--spec delete(surreal_pid(), Thing :: iodata()) -> surreal_result:result().
+-spec delete(surreal_pid(), Thing :: surreal_entity:thing()) -> surreal_result:result().
 delete(Pid, Thing) ->
-    Params = [unicode:characters_to_binary(Thing)],
+    Params = [unicode:characters_to_binary(surreal_entity:convert(Thing))],
     send_handle_message(Pid, <<"delete">>, Params).
 
 %%-------------------------------------------------------------------------

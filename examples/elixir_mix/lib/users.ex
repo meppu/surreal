@@ -5,11 +5,11 @@ defmodule Example.Users do
   @table "users"
 
   def add(name, age) do
-    Surreal.create(@conn, "#{@table}:#{name}", %{"age" => age, "verified" => false})
+    Surreal.create(@conn, {@table, name}, %{"age" => age, "verified" => false})
   end
 
   def get(name) do
-    Surreal.select(@conn, "#{@table}:#{name}")
+    Surreal.select(@conn, {@table, name})
   end
 
   def get_all() do
@@ -17,10 +17,10 @@ defmodule Example.Users do
   end
 
   def verify(name) do
-    Surreal.merge(@conn, "#{@table}:#{name}", %{"verified" => true})
+    Surreal.merge(@conn, {@table, name}, %{"verified" => true})
   end
 
   def remove(name) do
-    Surreal.delete(@conn, "#{@table}:#{name}")
+    Surreal.delete(@conn, {@table, name})
   end
 end
