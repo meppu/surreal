@@ -100,7 +100,7 @@ handle_cast(
 ) ->
     ets:insert(Table, {PacketId, Client}),
 
-    PacketEncoded = jsx:encode(Packet),
+    PacketEncoded = jsone:encode(Packet),
     gun:ws_send(ConnPid, StreamRef, {text, PacketEncoded}),
 
     {noreply, State};
@@ -108,7 +108,7 @@ handle_cast(close, State) ->
     {stop, {shutdown, client}, State}.
 
 handle_info({gun_ws, ConnPid, StreamRef, {text, Packet}}, {_ConnPid, _StreamRef, Table, Opts}) ->
-    #{<<"id">> := PacketId} = PacketDecoded = jsx:decode(Packet),
+    #{<<"id">> := PacketId} = PacketDecoded = jsone:decode(Packet),
 
     case ets:lookup(Table, PacketId) of
         [{PacketId, Pid} | _Other] ->

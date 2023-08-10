@@ -6,7 +6,7 @@
         kernel,
         stdlib,
         gun,
-        jsx
+        jsone
     ]},
     {env, []},
     {modules, []},
