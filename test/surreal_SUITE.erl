@@ -151,8 +151,10 @@ users_patch2(Config) ->
     Pid = ?config(db, Config),
 
     PatchData = [
-        {remove, "/extra"},
-        {remove, "/other"}
+        {move, "/extra", "/verified"},
+        {test, "/age", 16},
+        {remove, "/other"},
+        {copy, "/age", "/followers"}
     ],
 
     {ok, Patches} = surreal:patch(Pid, {"users", "meppu"}, PatchData),
@@ -163,7 +165,7 @@ users_delete(Config) ->
 
     Response = surreal:delete(Pid, {"users", "meppu"}),
 
-    Expected = {ok, #{<<"id">> => <<"users:meppu">>, <<"age">> => 16}},
+    Expected = {ok, #{<<"id">> => <<"users:meppu">>, <<"age">> => 16, <<"verified">> => true, <<"followers">> => 16}},
     ?assertEqual(Expected, Response).
 
 users_insert(Config) ->
