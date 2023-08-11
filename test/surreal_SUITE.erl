@@ -165,7 +165,13 @@ users_delete(Config) ->
 
     Response = surreal:delete(Pid, {"users", "meppu"}),
 
-    Expected = {ok, #{<<"id">> => <<"users:meppu">>, <<"age">> => 16, <<"verified">> => true, <<"followers">> => 16}},
+    Expected =
+        {ok, #{
+            <<"id">> => <<"users:meppu">>,
+            <<"age">> => 16,
+            <<"verified">> => true,
+            <<"followers">> => 16
+        }},
     ?assertEqual(Expected, Response).
 
 users_insert(Config) ->
