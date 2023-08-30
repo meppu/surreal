@@ -29,8 +29,16 @@
     connectivity_signin2/1
 ]).
 
+-export([
+    other_child_spec/1
+]).
+
 all() ->
-    [{group, users}, {group, connectivity}].
+    [
+        {group, users},
+        {group, connectivity},
+        other_child_spec
+    ].
 
 groups() ->
     [
@@ -130,8 +138,16 @@ users_patch(Config) ->
         {diff, "/other", <<"@@ -1,4 +1,4 @@\n te\n-s\n+x\n t\n">>}
     ],
 
-    {ok, Patches} = surreal:patch(Pid, {"users", "meppu"}, PatchData),
-    ?assert(is_list(Patches)).
+    Response = surreal:patch(Pid, {"users", "meppu"}, PatchData),
+    Expected =
+        {ok, #{
+            <<"id">> => <<"users:meppu">>,
+            <<"age">> => 16,
+            <<"extra">> => true,
+            <<"other">> => <<"text">>
+        }},
+
+    ?assertEqual(Expected, Response).
 
 users_select(Config) ->
     Pid = ?config(db, Config),
@@ -157,8 +173,15 @@ users_patch2(Config) ->
         {copy, "/age", "/followers"}
     ],
 
-    {ok, Patches} = surreal:patch(Pid, {"users", "meppu"}, PatchData),
-    ?assert(is_list(Patches)).
+    Response = surreal:patch(Pid, {"users", "meppu"}, PatchData),
+    Expected =
+        {ok, #{
+            <<"id">> => <<"users:meppu">>,
+            <<"age">> => 16,
+            <<"verified">> => true,
+            <<"followers">> => 16
+        }},
+    ?assertEqual(Expected, Response).
 
 users_delete(Config) ->
     Pid = ?config(db, Config),
@@ -293,3 +316,21 @@ connectivity_signin2(Config) ->
 
     {ok, Token} = surreal:signin(Pid, "root", "root"),
     ?assert(is_binary(Token)).
+
+%%%==========================================================================
+%%%
+%%%   Edges group
+%%%
+%%%==========================================================================
+
+other_child_spec(_Config) ->
+    Uri = "surreal://root@root:localhost:8000/test/test",
+    ConnName = db,
+    Opts = #{},
+
+    ChildSpec = surreal:child_spec({Uri, ConnName, Opts}),
+    Expected = #{
+        id => ConnName, start => {surreal, start_link, [Uri, ConnName, Opts]}, restart => transient
+    },
+
+    ?assertEqual(Expected, ChildSpec).
